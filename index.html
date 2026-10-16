@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>El Muro de las Proyectadas</title>
   
-  <!-- SDK Supabase y html2canvas -->
+  <!-- SDK de Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -440,29 +440,10 @@
   </a>
 
   <script>
-    // --- DETECTOR AUTOMÁTICO DE ERRORES ---
-    window.onerror = function(msg, url, lineNo, columnNo, error) {
-      const container = document.getElementById("posts-container");
-      if(container) {
-        container.innerHTML = `
-          <div style="background: #3a1515; border: 1px solid #f85149; padding: 16px; border-radius: 8px; color: #ff7b72; margin-top: 10px;">
-            <h3 style="margin-top:0;">⚠️ Script Detenido por un Error:</h3>
-            <p><strong>Motivo:</strong> ${msg}</p>
-            <p style="font-size: 13px; color: #8b949e;">Si dice "supabase is not defined", significa que tu internet bloqueó el CDN de Supabase (Pasa mucho con CANTV). Intenta activando un VPN (como 1.1.1.1 o ProtonVPN).</p>
-          </div>
-        `;
-      }
-      return false;
-    };
-
-    // Asegurar que supabase cargó antes de seguir
-    if (typeof window.supabase === 'undefined') {
-      throw new Error("La librería de Supabase no cargó (CDN bloqueado).");
-    }
-
+    // --- ESTA FUE LA SOLUCIÓN: Cambiamos "supabase" por "db" ---
     const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let vistaActual = 'feed';
     let postsData = [];
@@ -471,16 +452,16 @@
     const AVATAR_1 = "https://i.postimg.cc/y6TBmgK2/Proyectado2.webp";
     const AVATAR_2 = "https://i.postimg.cc/PqZnPNKV/670b134a-0bde-4bde-960d-cfb4aa4eb982.jpg";
 
-    function actualizarHypeText(val) {
+    window.actualizarHypeText = function(val) {
       document.getElementById("hype-value").innerText = `${val}% Bajón`;
-    }
+    };
 
-    function cambiarVista(vista) {
+    window.cambiarVista = function(vista) {
       vistaActual = vista;
       document.getElementById('tab-feed').classList.toggle('active', vista === 'feed');
       document.getElementById('tab-cine').classList.toggle('active', vista === 'cine');
       renderPosts();
-    }
+    };
 
     document.getElementById("anonimo-check").addEventListener("change", function(e) {
       const autorInput = document.getElementById("autor");
@@ -537,24 +518,20 @@
 
     async function cargarPosts() {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await db
           .from("proyectadas")
           .select("*")
           .order("created_at", { ascending: false });
 
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
         
         postsData = data;
         renderPosts();
       } catch (err) {
-        // Muestra el error de la base de datos visualmente
         document.getElementById("posts-container").innerHTML = `
           <div style="background: #3a1515; border: 1px solid #f85149; padding: 16px; border-radius: 8px; color: #ff7b72;">
-            <h3 style="margin-top:0;">❌ Error conectando a la Base de Datos:</h3>
+            <h3 style="margin-top:0;">❌ Error al cargar la base de datos:</h3>
             <p>${err.message || JSON.stringify(err)}</p>
-            <p style="font-size: 13px; color: #8b949e;">Si dice "relation proyectadas does not exist", significa que no creaste la tabla en Supabase.</p>
           </div>
         `;
       }
@@ -635,7 +612,7 @@
       }).join("");
     }
 
-    function haVotado(id, tipo) {
+    window.haVotado = function(id, tipo) {
       return localStorage.getItem(`reacc_${id}_${tipo}`) === "true";
     }
 
@@ -643,7 +620,7 @@
       if (haVotado(id, tipo)) return;
       localStorage.setItem(`reacc_${id}_${tipo}`, "true");
 
-      await supabase.rpc("reaccionar", { post_id: id, tipo_reaccion: tipo });
+      await db.rpc("reaccionar", { post_id: id, tipo_reaccion: tipo });
       cargarPosts();
     };
 
@@ -672,7 +649,7 @@
       const hype_level = parseInt(document.getElementById("hype-range").value);
 
       try {
-        const { error } = await supabase.from("proyectadas").insert([{
+        const { error } = await db.from("proyectadas").insert([{
           autor,
           contenido,
           categoria,
@@ -699,21 +676,20 @@
     });
 
     try {
-      supabase
-        .channel("muro-realtime")
+      db.channel("muro-realtime")
         .on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, () => {
           cargarPosts();
         })
         .subscribe();
     } catch (e) {
-      console.error("No se pudo iniciar el tiempo real (WebSockets bloqueados):", e);
+      console.log("No se pudo iniciar realtime");
     }
 
     function escapeHtml(str) {
       return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
-    // Iniciar
+    // Arrancar la magia
     cargarPosts();
   </script>
 </body>
