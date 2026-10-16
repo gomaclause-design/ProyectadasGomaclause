@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Muro de las Proyectadas</title>
+  <!-- SDK Supabase y html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #0b0e14;
+      --card-bg: #151b23;
+      --border: #30363d;
+      --accent: #58a6ff;
+      --gold: #f1e05a;
+      --red: #f85149;
+      --text: #e6edf3;
+      --text-muted: #8b949e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      padding: 20px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .container { width: 100%; max-width: 650px; }
+
+    /* Cabecera con imagen destacada */
+    .hero-banner {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+    .hero-banner img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-title {
+      padding: 16px;
+    }
+    .hero-title h1 {
+      font-size: 24px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .hero-title p {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Formulario */
+    form {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 18px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    input[type="text"], textarea, select, input[type="date"] {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      width: 100%;
+    }
+    .form-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .form-row > * { flex: 1; min-width: 140px; }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    /* Slider de Hype */
+    .hype-container {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 6px;
+    }
+    .hype-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: #f78166;
+    }
+
+    .btn-submit {
+      background: #238636;
+      color: white;
+      font-weight: bold;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: #2ea043; }
+
+    /* Barra de filtros (Feed vs Proyector de cine) */
+    .nav-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+    .tab-btn.active {
+      color: #fff;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+    }
+
+    /* Tarjetas del Feed */
+    .post-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--accent);
+    }
+    .user-info { flex: 1; }
+    .author-name { font-weight: bold; font-size: 15px; color: var(--accent); }
+    .post-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #21262d;
+      color: #79c0ff;
+      border: 1px solid #388bfd33;
+    }
+    .post-body {
+      font-size: 15px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      margin-bottom: 12px;
+    }
+
+    /* Hype bar en la tarjeta */
+    .card-hype-bar {
+      height: 4px;
+      border-radius: 2px;
+      background: #21262d;
+      margin-bottom: 12px;
+      overflow: hidden;
+    }
+    .card-hype-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #58a6ff, #f78166);
+    }
+
+    /* Cápsula del tiempo pill */
+    .capsule-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1c2128;
+      border: 1px solid #d29922;
+      color: var(--gold);
+      font-size: 12px;
+      padding: 4px 8px;
+      border-radius: 6px;
+      margin-bottom: 12px;
+    }
+
+    /* Acciones inferiores */
+    .post-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+    .reactions { display: flex; gap: 6px; }
+    .react-btn, .btn-capture {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 5px 10px;
+      border-radius: 16px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .react-btn:hover, .btn-capture:hover { background: #21262d; }
+    .react-btn.reacted { border-color: var(--accent); color: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Banner Principal -->
+    <div class="hero-banner">
+      <img src="https://i.postimg.cc/PqZnPNKV/670b134a-0bde-4bde-960d-cfb4aa4eb982.jpg" alt="Banner de Proyectados" />
+      <div class="hero-title">
+        <h1>🗿 El Muro de las Proyectadas 🎬</h1>
+        <p>Solo alucinadas de calibre supremo.</p>
+      </div>
+    </div>
+
+    <!-- Formulario de Publicación -->
+    <form id="proyectada-form">
+      <div class="form-row">
+        <input type="text" id="autor" placeholder="Tu alias (ej: @proyector_chad)" required maxlength="25" />
+        <select id="categoria">
+          <option value="General">🏷️ #General</option>
+          <option value="Gimnasio">💪 #Gimnasio</option>
+          <option value="Empresarial">💼 #Empresarial</option>
+          <option value="Gaming">🎮 #Gaming</option>
+          <option value="Delirio Puro">🛸 #DelirioPuro</option>
+        </select>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" id="anonimo-check" />
+        Postear como <strong>@ProyectadoAnonimo</strong> 🕶️
+      </label>
+
+      <textarea id="contenido" rows="3" placeholder="Suelte esa proyección legendaria..." required></textarea>
+
+      <!-- Medidor de Proyección -->
+      <div class="hype-container">
+        <div class="hype-header">
+          <span>Medidor de Proyección:</span>
+          <span id="hype-value" style="color: #f78166;">50% Hype</span>
+        </div>
+        <input type="range" id="hype-range" min="1" max="100" value="50" oninput="actualizarHypeText(this.value)" />
+      </div>
+
+      <!-- Cápsula del tiempo -->
+      <div>
+        <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px;">
+          ⏳ Cápsula del Tiempo (Fecha límite de cumplimiento - opcional):
+        </label>
+        <input type="date" id="fecha-limite" />
+      </div>
+
+      <button type="submit" class="btn-submit">Publicar en el Muro</button>
+    </form>
+
+    <!-- Pestañas de Vista -->
+    <div class="nav-tabs">
+      <button class="tab-btn active" id="tab-feed" onclick="cambiarVista('feed')">📜 Muro Completo</button>
+      <button class="tab-btn" id="tab-cine" onclick="cambiarVista('cine')">🎥 Proyector de Cine (Top)</button>
+    </div>
+
+    <!-- Lista del Feed -->
+    <div id="posts-container">Cargando proyecciones...</div>
+
+  </div>
+
+  <script>
+    // ⚠️ REEMPLAZA ESTO CON TUS CLAVES DE SUPABASE
+    const SUPABASE_URL = "https://TU_PROYECTO.supabase.co";
+    const SUPABASE_ANON_KEY = "TU_PUBLIC_ANON_KEY";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let vistaActual = 'feed';
+    let postsData = [];
+
+    // Avatares asignados
+    const AVATAR_1 = "https://i.postimg.cc/Y2xk6G7V/Proyectado1.webp";
+    const AVATAR_2 = "https://i.postimg.cc/y6TBmgK2/Proyectado2.webp";
+
+    function actualizarHypeText(val) {
+      document.getElementById("hype-value").innerText = `${val}% Hype`;
+    }
+
+    function cambiarVista(vista) {
+      vistaActual = vista;
+      document.getElementById('tab-feed').classList.toggle('active', vista === 'feed');
+      document.getElementById('tab-cine').classList.toggle('active', vista === 'cine');
+      renderPosts();
+    }
+
+    async function cargarPosts() {
+      const { data, error } = await supabase
+        .from("proyectadas")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        document.getElementById("posts-container").innerText = "Error al cargar el muro.";
+        return;
+      }
+      postsData = data;
+      renderPosts();
+    }
+
+    function renderPosts() {
+      const container = document.getElementById("posts-container");
+      let lista = [...postsData];
+
+      if (vistaActual === 'cine') {
+        // En el Proyector de Cine ordenamos por la suma total de reacciones
+        lista.sort((a, b) => {
+          const scoreA = (a.chad_count || 0) + (a.fuego_count || 0) + (a.skull_count || 0);
+          const scoreB = (b.chad_count || 0) + (b.fuego_count || 0) + (b.skull_count || 0);
+          return scoreB - scoreA;
+        });
+      }
+
+      if (lista.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px;">No hay proyecciones aún. Sé el primero en proyectarte.</div>`;
+        return;
+      }
+
+      container.innerHTML = lista.map((post, idx) => {
+        // Alternar avatar según el ID para variedad visual
+        const avatarUrl = (post.id % 2 === 0) ? AVATAR_1 : AVATAR_2;
+        const totalVotos = (post.chad_count || 0) + (post.fuego_count || 0) + (post.skull_count || 0);
+
+        // Cápsula del tiempo check
+        let capsulaHtml = "";
+        if (post.fecha_limite) {
+          const hoy = new Date();
+          const target = new Date(post.fecha_limite);
+          const diff = Math.ceil((target - hoy) / (1000 * 60 * 60 * 24));
+          const estado = diff >= 0 ? `Quedan ${diff} días` : `¡Plazo vencido!`;
+          capsulaHtml = `<div class="capsule-pill">⏳ Cápsula: vence ${post.fecha_limite} (${estado})</div>`;
+        }
+
+        return `
+          <div class="post-card" id="card-${post.id}">
+            <div class="post-header">
+              <img class="avatar" src="${avatarUrl}" alt="Avatar" />
+              <div class="user-info">
+                <div class="author-name">${escapeHtml(post.autor)}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">
+                  ${new Date(post.created_at).toLocaleDateString()} • <span class="post-tag">#${escapeHtml(post.categoria || 'General')}</span>
+                </div>
+              </div>
+              ${vistaActual === 'cine' && idx === 0 ? '<span style="font-size: 20px;" title="Rey del Cine">👑</span>' : ''}
+            </div>
+
+            <div class="card-hype-bar">
+              <div class="card-hype-fill" style="width: ${post.hype_level || 50}%"></div>
+            </div>
+
+            <div class="post-body">${escapeHtml(post.contenido)}</div>
+
+            ${capsulaHtml}
+
+            <div class="post-footer">
+              <div class="reactions">
+                <button class="react-btn ${haVotado(post.id, 'chad') ? 'reacted' : ''}" 
+                  onclick="votar(${post.id}, 'chad')">
+                  🗿 <span>${post.chad_count || 0}</span>
+                </button>
+                <button class="react-btn ${haVotado(post.id, 'fuego') ? 'reacted' : ''}" 
+                  onclick="votar(${post.id}, 'fuego')">
+                  🔥 <span>${post.fuego_count || 0}</span>
+                </button>
+                <button class="react-btn ${haVotado(post.id, 'skull') ? 'reacted' : ''}" 
+                  onclick="votar(${post.id}, 'skull')">
+                  💀 <span>${post.skull_count || 0}</span>
+                </button>
+              </div>
+
+              <button class="btn-capture" onclick="descargarTarjeta(${post.id})">
+                📸 Captura
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    // Manejo de Reacciones
+    function haVotado(id, tipo) {
+      return localStorage.getItem(`reacc_${id}_${tipo}`) === "true";
+    }
+
+    window.votar = async function(id, tipo) {
+      if (haVotado(id, tipo)) return;
+      localStorage.setItem(`reacc_${id}_${tipo}`, "true");
+
+      await supabase.rpc("reaccionar", { post_id: id, tipo_reaccion: tipo });
+      cargarPosts();
+    };
+
+    // Generar captura en imagen para WhatsApp/Discord
+    window.descargarTarjeta = function(id) {
+      const card = document.getElementById(`card-${id}`);
+      html2canvas(card, { backgroundColor: "#151b23", scale: 2 }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = `proyectada-${id}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+      });
+    };
+
+    // Publicar
+    document.getElementById("proyectada-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const isAnon = document.getElementById("anonimo-check").checked;
+      const autorInput = document.getElementById("autor").value.trim();
+      const autor = isAnon ? "@ProyectadoAnonimo" : autorInput;
+      const contenido = document.getElementById("contenido").value.trim();
+      const categoria = document.getElementById("categoria").value;
+      const hype_level = parseInt(document.getElementById("hype-range").value);
+      const fecha_limite = document.getElementById("fecha-limite").value || null;
+
+      const { error } = await supabase.from("proyectadas").insert([{
+        autor,
+        contenido,
+        categoria,
+        hype_level,
+        fecha_limite
+      }]);
+
+      if (!error) {
+        document.getElementById("contenido").value = "";
+        document.getElementById("fecha-limite").value = "";
+        cargarPosts();
+      } else {
+        alert("Fallo al postear: " + error.message);
+      }
+    });
+
+    // Escucha en tiempo real
+    supabase
+      .channel("muro-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, () => {
+        cargarPosts();
+      })
+      .subscribe();
+
+    function escapeHtml(str) {
+      return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    cargarPosts();
+  </script>
+</body>
+</html>
