@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>El Muro de las Proyectadas</title>
   
-  <!-- AQUÍ ESTÁ LA SOLUCIÓN: Nuevo CDN para evitar bloqueos en Venezuela -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
@@ -47,8 +46,6 @@
     .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; }
     .auth-switch { color: var(--accent); font-size: 13px; cursor: pointer; text-align: center; }
     .auth-switch:hover { text-decoration: underline; }
-    
-    /* ESTILOS DEL ERROR */
     #auth-error { color: #f85149; font-size: 13px; margin-bottom: 12px; text-align: center; display: none; background: #3a1515; padding: 10px; border-radius: 6px; width: 100%; border: 1px solid #f85149;}
 
     /* ================= MURO PRINCIPAL ================= */
@@ -93,9 +90,29 @@
     .post-image-box img { width: 100%; max-height: 380px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;}
     .card-hype-bar { height: 3px; background: #182230; margin-bottom: 12px; }
     .card-hype-fill { height: 100%; background: linear-gradient(90deg, #388bfd, #8957e5); }
-    .post-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; }
-    .react-btn, .btn-capture { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 16px; font-size: 12px; cursor: pointer; }
+    
+    .post-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; flex-wrap: wrap; gap: 10px;}
+    .reactions { display: flex; gap: 6px; align-items: center;}
+    .react-btn, .btn-capture { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+    .react-btn:hover, .btn-capture:hover { background: #1c2128; }
     .react-btn.reacted { border-color: var(--accent); color: var(--accent); }
+
+    /* ================= COMENTARIOS ================= */
+    .comments-section {
+      margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 12px; display: none;
+      animation: fadeIn 0.2s ease-in;
+    }
+    @keyframes fadeIn { from{opacity:0; transform:translateY(-5px);} to{opacity:1; transform:translateY(0);} }
+    .comment-item {
+      background: #090c10; border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px;
+      margin-bottom: 8px; font-size: 13.5px;
+    }
+    .comment-author { font-weight: bold; color: var(--accent); cursor: pointer; }
+    .comment-author:hover { text-decoration: underline; }
+    .comment-input-box { display: flex; gap: 8px; margin-top: 12px; }
+    .comment-input-box input { flex: 1; padding: 10px; border-radius: 6px; background: #090c10; border: 1px solid var(--border); color: var(--text); font-size: 13px;}
+    .comment-input-box button { background: #238636; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;}
+    .comment-input-box button:hover { background: #2ea043; }
 
     /* ================= SECCIÓN MI PERFIL ================= */
     #mi-perfil-container { display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
@@ -114,12 +131,9 @@
   <!-- ================= LOGIN / REGISTRO ================= -->
   <div id="auth-screen" class="container">
     <h2 id="auth-title">Entrar al Muro 🗿</h2>
-    
     <div id="auth-error"></div>
-
     <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Alex_Goma)" autocomplete="off" />
     <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña :3" />
-    
     <button class="auth-btn" id="auth-main-btn" onclick="iniciarSesion()">Entrar</button>
     <div class="auth-switch" id="auth-toggle-btn" onclick="toggleAuthMode()">¿No tienes perfil? Regístrate aquí</div>
   </div>
@@ -208,6 +222,7 @@
     var imagenBase64 = null;
     var db = null;
     
+    // RANGO OWNER (Modificable)
     var OWNER_USERNAME = "Alex_Goma";
 
     function escapeHtml(str) { return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
@@ -234,7 +249,7 @@
     };
 
     if (typeof window.supabase === 'undefined') {
-      mostrarErrorAuth("Tu internet o navegador está bloqueando la base de datos.<br/><b>Solución:</b> Usa un VPN (como ProtonVPN o 1.1.1.1) y recarga la página.");
+      mostrarErrorAuth("Supabase no ha cargado. Revisa tu conexión a internet.");
     } else {
       const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
       const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
@@ -263,40 +278,28 @@
     }
 
     window.iniciarSesion = async function() {
-      if (!db) return mostrarErrorAuth("Supabase no ha cargado. Verifica tu conexión o enciende un VPN.");
+      if (!db) return mostrarErrorAuth("Supabase no cargó.");
       
       const usernameInput = document.getElementById('auth-username').value.trim();
       const password = document.getElementById('auth-pass').value;
       const btn = document.getElementById('auth-main-btn');
-      
       document.getElementById('auth-error').style.display = 'none';
 
-      if (!usernameInput || !password) {
-        return mostrarErrorAuth("Llena el usuario y la contraseña por favor.");
-      }
-
-      if (password.length < 6) {
-        return mostrarErrorAuth("La contraseña debe tener mínimo 6 caracteres.");
-      }
+      if (!usernameInput || !password) return mostrarErrorAuth("Llena el usuario y la contraseña.");
+      if (password.length < 6) return mostrarErrorAuth("La contraseña debe tener mínimo 6 caracteres.");
       
       const fakeEmail = usernameInput.toLowerCase() + "@muro.com";
-      
-      btn.innerText = "Cargando...";
-      btn.disabled = true;
+      btn.innerText = "Cargando..."; btn.disabled = true;
 
       try {
         if (modoRegistro) {
           const { data, error } = await db.auth.signUp({
-            email: fakeEmail,
-            password: password,
-            options: { data: { username: usernameInput } }
+            email: fakeEmail, password: password, options: { data: { username: usernameInput } }
           });
-          
           if (error) {
-            if(error.message.includes("already registered") || error.message.includes("User already registered")) throw new Error("Ese nombre de usuario ya está registrado. Intenta iniciar sesión.");
+            if(error.message.includes("already registered") || error.message.includes("User already registered")) throw new Error("Ese nombre de usuario ya está registrado.");
             throw error;
           }
-          
           if (data.user) {
             await db.from('perfiles').insert([{ id: data.user.id, username: usernameInput }]);
             alert("¡Perfil creado con éxito!");
@@ -310,8 +313,7 @@
       } catch (err) {
         mostrarErrorAuth(err.message);
       } finally {
-        btn.innerText = modoRegistro ? "Registrarme" : "Entrar";
-        btn.disabled = false;
+        btn.innerText = modoRegistro ? "Registrarme" : "Entrar"; btn.disabled = false;
       }
     };
 
@@ -337,6 +339,58 @@
       }
     };
 
+    // --- LÓGICA DE COMENTARIOS ---
+    window.toggleComentarios = function(postId) {
+      const sec = document.getElementById('comments-' + postId);
+      if (sec.style.display === 'none' || sec.style.display === '') {
+        sec.style.display = 'block';
+        cargarComentarios(postId);
+      } else {
+        sec.style.display = 'none';
+      }
+    };
+
+    window.cargarComentarios = async function(postId) {
+      const list = document.getElementById('comments-list-' + postId);
+      list.innerHTML = "<div style='color: var(--text-muted); font-size:12px;'>Cargando...</div>";
+      
+      const { data, error } = await db.from('comentarios').select('*').eq('post_id', postId).order('created_at', { ascending: true });
+      if(error) { list.innerHTML = "Error al cargar comentarios."; return; }
+      
+      if(data.length === 0) {
+        list.innerHTML = "<div style='color: var(--text-muted); font-size:12px; margin-bottom:5px;'>Nadie ha comentado. Sé el primero.</div>";
+        return;
+      }
+      
+      list.innerHTML = data.map(c => {
+        let tag = generarEtiquetaOwner(c.autor);
+        return `
+          <div class="comment-item">
+            <span class="comment-author" onclick="abrirPerfil('${escapeHtml(c.autor)}')">@${escapeHtml(c.autor)}${tag}</span>
+            <span style="color: #d0d7de;">${escapeHtml(c.contenido)}</span>
+          </div>`;
+      }).join("");
+    };
+
+    window.enviarComentario = async function(postId) {
+      const input = document.getElementById('comment-input-' + postId);
+      const btn = document.getElementById('btn-comment-' + postId);
+      const contenido = input.value.trim();
+      
+      if(!contenido) return;
+      
+      input.disabled = true; btn.disabled = true;
+      const { error } = await db.from('comentarios').insert([{ post_id: postId, autor: usernameActual, contenido }]);
+      input.disabled = false; btn.disabled = false;
+      
+      if(error) alert("Error al comentar: " + error.message);
+      else {
+        input.value = "";
+        cargarComentarios(postId);
+      }
+    };
+
+    // --- PERFIL Y FEED ---
     async function cargarMiPerfil() {
       if(!db) return;
       const { data, error } = await db.from('perfiles').select('biografia').eq('id', usuarioActual.id).single();
@@ -357,18 +411,12 @@
       document.getElementById('user-modal').style.display = 'flex';
 
       const { data, error } = await db.from('perfiles').select('biografia').eq('username', usernameClick).single();
-      
       if(data) document.getElementById('modal-bio').innerText = data.biografia || "Este usuario aún no tiene biografía.";
       else document.getElementById('modal-bio').innerText = "Perfil no encontrado.";
     };
 
-    window.cerrarModal = function() {
-      document.getElementById('user-modal').style.display = 'none';
-    };
-
-    document.getElementById('user-modal').addEventListener('click', function(e) {
-      if(e.target === this) cerrarModal();
-    });
+    window.cerrarModal = function() { document.getElementById('user-modal').style.display = 'none'; };
+    document.getElementById('user-modal').addEventListener('click', function(e) { if(e.target === this) cerrarModal(); });
 
     document.getElementById("input-file").addEventListener("change", function(e) {
       const file = e.target.files[0];
@@ -429,13 +477,24 @@
             <div class="card-hype-bar"><div class="card-hype-fill" style="width: ${post.hype_level || 50}%"></div></div>
             <div class="post-body">${escapeHtml(post.contenido)}</div>
             ${imgHtml}
+            
             <div class="post-footer">
               <div class="reactions">
                 <button class="react-btn" onclick="votar(${post.id}, 'chad')">💔 <span>${post.chad_count || 0}</span></button>
                 <button class="react-btn" onclick="votar(${post.id}, 'fuego')">🚬 <span>${post.fuego_count || 0}</span></button>
                 <button class="react-btn" onclick="votar(${post.id}, 'skull')">💀 <span>${post.skull_count || 0}</span></button>
+                <button class="react-btn" onclick="toggleComentarios(${post.id})">💬 Comentar</button>
               </div>
               <button class="btn-capture" onclick="descargarTarjeta(${post.id})">📸 Captura</button>
+            </div>
+
+            <!-- Sección de Comentarios Oculta -->
+            <div class="comments-section" id="comments-${post.id}">
+              <div id="comments-list-${post.id}"></div>
+              <div class="comment-input-box">
+                <input type="text" id="comment-input-${post.id}" placeholder="Responde a esto..." />
+                <button id="btn-comment-${post.id}" onclick="enviarComentario(${post.id})">Enviar</button>
+              </div>
             </div>
           </div>
         `;
@@ -478,7 +537,18 @@
     });
 
     if(db) {
-      try { db.channel("muro-realtime").on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, cargarPosts).subscribe(); } catch(e){}
+      try { 
+        db.channel("muro-realtime").on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, cargarPosts).subscribe(); 
+        
+        // Tiempo real para los comentarios
+        db.channel("comentarios-realtime").on("postgres_changes", { event: "INSERT", schema: "public", table: "comentarios" }, (payload) => {
+          const postId = payload.new.post_id;
+          const sec = document.getElementById('comments-' + postId);
+          if(sec && sec.style.display === 'block') {
+            cargarComentarios(postId);
+          }
+        }).subscribe();
+      } catch(e){}
       verificarSesion();
     }
   </script>
