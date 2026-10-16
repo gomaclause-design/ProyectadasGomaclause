@@ -30,123 +30,98 @@
     }
     .container { width: 100%; max-width: 650px; }
 
-    /* ================= PANTALLA DE LOGIN ================= */
+    /* ================= LOGIN ================= */
     #auth-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin-top: 10vh;
-      width: 100%;
-      max-width: 350px;
-      background: var(--card-bg);
-      padding: 30px 20px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin-top: 10vh; width: 100%; max-width: 350px; background: var(--card-bg);
+      padding: 30px 20px; border-radius: 12px; border: 1px solid var(--border);
       box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     #auth-screen h2 { margin-bottom: 20px; color: #e6edf3; text-align: center; }
     .auth-input {
-      background: #090c10; border: 1px solid var(--border);
-      color: var(--text); padding: 12px; border-radius: 6px;
-      width: 100%; margin-bottom: 12px; font-size: 15px;
+      background: #090c10; border: 1px solid var(--border); color: var(--text); 
+      padding: 12px; border-radius: 6px; width: 100%; margin-bottom: 12px; font-size: 15px;
     }
     .auth-btn {
-      width: 100%; background: #1f364d; color: #fff; font-weight: bold;
-      border: 1px solid #388bfd44; padding: 12px; border-radius: 6px;
-      cursor: pointer; transition: 0.2s; margin-bottom: 10px;
+      width: 100%; background: #1f364d; color: #fff; font-weight: bold; border: 1px solid #388bfd44; 
+      padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; margin-bottom: 10px;
     }
     .auth-btn:hover { background: #264766; }
     .auth-switch { color: var(--accent); font-size: 13px; cursor: pointer; text-align: center; }
     .auth-switch:hover { text-decoration: underline; }
 
-    /* ================= MURO (Oculto por defecto) ================= */
+    /* ================= MURO PRINCIPAL ================= */
     #app-screen { display: none; width: 100%; }
 
-    /* Cabecera */
     .hero-banner {
-      background: var(--card-bg); border: 1px solid var(--border);
-      border-radius: 12px; overflow: hidden; margin-bottom: 24px; text-align: center;
-      position: relative;
+      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; 
+      overflow: hidden; margin-bottom: 24px; text-align: center; position: relative;
     }
-    .hero-banner img {
-      width: 100%; height: 200px; object-fit: cover; display: block; filter: brightness(0.85);
-    }
+    .hero-banner img { width: 100%; height: 200px; object-fit: cover; display: block; filter: brightness(0.85); }
     .hero-title { padding: 16px; }
     .hero-title h1 { font-size: 23px; color: #e6edf3; display: flex; justify-content: center; gap: 10px; }
     .hero-title p { font-size: 13px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
     
     .logout-btn {
       position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6);
-      border: 1px solid var(--border); color: #fff; padding: 5px 10px;
-      border-radius: 6px; font-size: 12px; cursor: pointer;
+      border: 1px solid var(--border); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
     }
 
-    /* Formulario de Post */
-    form {
-      background: var(--card-bg); border: 1px solid var(--border);
-      padding: 18px; border-radius: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;
-    }
-    textarea, select { background: #090c10; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; width: 100%; }
-    
+    form { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    textarea, select { background: #090c10; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; width: 100%; font-family: inherit;}
     .file-upload-box { border: 1px dashed var(--border); padding: 12px; border-radius: 8px; background: #090c10; }
     .custom-file-btn { background: #182230; border: 1px solid var(--border); color: var(--accent); padding: 8px 14px; border-radius: 6px; cursor: pointer; display: inline-block; font-size: 13px;}
     #input-file { display: none; }
     .preview-box { display: none; position: relative; margin-top: 10px; }
     .preview-box img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; }
-
     .hype-container { background: #090c10; border: 1px solid var(--border); padding: 10px 14px; border-radius: 6px; }
     input[type="range"] { width: 100%; accent-color: #79a8d8; }
-
     .btn-submit { background: #1f364d; color: #fff; font-weight: bold; border: 1px solid #388bfd44; padding: 12px; border-radius: 6px; cursor: pointer; }
-    
-    /* Pestañas y Tarjetas */
-    .nav-tabs { display: flex; gap: 10px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-    .tab-btn { background: transparent; border: none; color: var(--text-muted); font-size: 14px; font-weight: bold; cursor: pointer; padding: 8px 12px; border-radius: 6px; }
+
+    /* Pestañas */
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px; overflow-x: auto;}
+    .tab-btn { background: transparent; border: none; color: var(--text-muted); font-size: 14px; font-weight: bold; cursor: pointer; padding: 8px 12px; border-radius: 6px; white-space: nowrap;}
     .tab-btn.active { color: #fff; background: var(--card-bg); border: 1px solid var(--border); }
 
+    /* Tarjetas de Post */
     .post-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
     .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #30363d; object-fit: cover; }
-    .author-name { font-weight: bold; color: var(--accent); }
-    .post-body { font-size: 15px; margin-bottom: 12px; white-space: pre-wrap; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #30363d; object-fit: cover; cursor: pointer;}
+    .author-name { font-weight: bold; color: var(--accent); cursor: pointer; }
+    .author-name:hover { text-decoration: underline; }
+    .post-body { font-size: 15px; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
     .post-image-box img { width: 100%; max-height: 380px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;}
-    
     .card-hype-bar { height: 3px; background: #182230; margin-bottom: 12px; }
     .card-hype-fill { height: 100%; background: linear-gradient(90deg, #388bfd, #8957e5); }
-
     .post-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; }
     .react-btn, .btn-capture { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 16px; font-size: 12px; cursor: pointer; }
     .react-btn.reacted { border-color: var(--accent); color: var(--accent); }
 
-    /* WhatsApp Flotante */
-    .whatsapp-float { position: fixed; bottom: 20px; right: 20px; z-index: 1000; display: flex; align-items: center; gap: 10px; background: #12161f; border: 1px solid #25d36644; padding: 8px 14px 8px 10px; border-radius: 50px; text-decoration: none; box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45); }
-    .wa-icon-circle { width: 36px; height: 36px; background: #25d366; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-    .wa-icon-circle svg { width: 22px; height: 22px; fill: #ffffff; }
-    .wa-text { color: #e6edf3; font-size: 13px; font-weight: 600; }
+    /* ================= SECCIÓN MI PERFIL ================= */
+    #mi-perfil-container { display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
+    .profile-avatar-large { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px; }
+    .profile-username { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 20px; }
+    
+    /* ================= MODAL PERFIL USUARIOS ================= */
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 90%; max-width: 400px; text-align: center; position: relative; }
+    .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
+    .modal-bio { margin-top: 15px; font-size: 14px; color: var(--text); white-space: pre-wrap; line-height: 1.5; background: #090c10; padding: 12px; border-radius: 8px; border: 1px solid var(--border);}
+    
   </style>
 </head>
 <body>
 
-  <!-- ================= PANTALLA DE LOGIN / REGISTRO ================= -->
+  <!-- ================= LOGIN / REGISTRO ================= -->
   <div id="auth-screen" class="container">
     <h2 id="auth-title">Entrar al Muro 🗿</h2>
-    
-    <input type="text" id="auth-phone" class="auth-input" placeholder="Número de celular" autocomplete="off" />
-    
-    <!-- Este campo solo aparece al registrarse -->
-    <input type="text" id="auth-alias" class="auth-input" placeholder="Tu Alias (ej: @Goma)" style="display: none;" autocomplete="off" />
-    
+    <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Goma)" autocomplete="off" />
     <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña :3" />
-    
     <button class="auth-btn" id="auth-main-btn" onclick="iniciarSesion()">Entrar</button>
-    
-    <div class="auth-switch" id="auth-toggle-btn" onclick="toggleAuthMode()">
-      ¿No tienes perfil? Regístrate aquí
-    </div>
+    <div class="auth-switch" id="auth-toggle-btn" onclick="toggleAuthMode()">¿No tienes perfil? Regístrate aquí</div>
   </div>
 
-  <!-- ================= APLICACIÓN PRINCIPAL ================= -->
+  <!-- ================= APLICACIÓN ================= -->
   <div id="app-screen" class="container">
     
     <div class="hero-banner">
@@ -154,61 +129,73 @@
       <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
       <div class="hero-title">
         <h1>🌧️ El Muro de las Proyectadas 🚬</h1>
-        <p>"Desahógate aquí, nadie sabrá que fuiste tú (o tal vez sí)..."</p>
       </div>
     </div>
 
-    <form id="proyectada-form">
-      <!-- Ya no pedimos el alias aquí, el sistema lo sabe automáticamente -->
-      <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px;">
-        Posteando como: <b id="display-alias">@Cargando...</b>
-      </div>
-
-      <select id="categoria">
-        <option value="LaExtraño">💔 #LaExtraño</option>
-        <option value="Sadboy">🌧️ #Sadboy</option>
-        <option value="Insomnio">🌙 #NochesDeInsomnio</option>
-        <option value="MeIlusioné">🥀 #MeIlusioné</option>
-        <option value="Desahogo">🕯️ #Desahogo</option>
-      </select>
-
-      <textarea id="contenido" rows="3" placeholder="Suelte ese desahogo melancólico..." required></textarea>
-
-      <div class="file-upload-box">
-        <label for="input-file" class="custom-file-btn">🖼️ Añadir foto (opcional)</label>
-        <input type="file" id="input-file" accept="image/*" />
-        <div class="preview-box" id="preview-box">
-          <img id="preview-img" src="" />
-          <button type="button" class="btn-remove-img" onclick="quitarImagen()">✕</button>
-        </div>
-      </div>
-
-      <div class="hype-container">
-        <div class="hype-header">
-          <span>Nivel de Bajón:</span>
-          <span id="hype-value" style="color: #79a8d8;">50%</span>
-        </div>
-        <input type="range" id="hype-range" min="1" max="100" value="50" oninput="document.getElementById('hype-value').innerText = this.value + '%'" />
-      </div>
-
-      <button type="submit" class="btn-submit" id="submit-btn">Soltar Proyección</button>
-    </form>
-
+    <!-- Pestañas -->
     <div class="nav-tabs">
       <button class="tab-btn active" id="tab-feed" onclick="cambiarVista('feed')">📜 Muro</button>
       <button class="tab-btn" id="tab-cine" onclick="cambiarVista('cine')">🎥 Salón Vip</button>
+      <button class="tab-btn" id="tab-perfil" onclick="cambiarVista('perfil')">👤 Mi Perfil</button>
     </div>
 
-    <div id="posts-container">Cargando...</div>
+    <!-- Contenedor Principal (Feed + Formulario) -->
+    <div id="main-content">
+      <form id="proyectada-form">
+        <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px;">
+          Posteando como: <b id="display-alias">@Cargando...</b>
+        </div>
+        <select id="categoria">
+          <option value="LaExtraño">💔 #LaExtraño</option>
+          <option value="Sadboy">🌧️ #Sadboy</option>
+          <option value="Insomnio">🌙 #NochesDeInsomnio</option>
+          <option value="MeIlusioné">🥀 #MeIlusioné</option>
+          <option value="Desahogo">🕯️ #Desahogo</option>
+        </select>
+        <textarea id="contenido" rows="3" placeholder="Suelte ese desahogo melancólico..." required></textarea>
+        
+        <div class="file-upload-box">
+          <label for="input-file" class="custom-file-btn">🖼️ Añadir foto (opcional)</label>
+          <input type="file" id="input-file" accept="image/*" />
+          <div class="preview-box" id="preview-box">
+            <img id="preview-img" src="" />
+            <button type="button" class="btn-remove-img" onclick="quitarImagen()">✕</button>
+          </div>
+        </div>
+
+        <div class="hype-container">
+          <div class="hype-header">
+            <span>Nivel de Bajón:</span>
+            <span id="hype-value" style="color: #79a8d8;">50%</span>
+          </div>
+          <input type="range" id="hype-range" min="1" max="100" value="50" oninput="document.getElementById('hype-value').innerText = this.value + '%'" />
+        </div>
+        <button type="submit" class="btn-submit" id="submit-btn">Soltar Proyección</button>
+      </form>
+
+      <div id="posts-container">Cargando...</div>
+    </div>
+
+    <!-- Contenedor Mi Perfil -->
+    <div id="mi-perfil-container">
+      <img src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" class="profile-avatar-large" />
+      <div class="profile-username" id="mi-username">@Usuario</div>
+      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px; text-align: left;">Mi Biografía:</p>
+      <textarea id="mi-biografia" rows="4" placeholder="Escribe algo sobre ti..."></textarea>
+      <button class="btn-submit" style="width: 100%; margin-top: 10px;" onclick="guardarBiografia()">Guardar Perfil</button>
+    </div>
+
   </div>
 
-  <!-- WhatsApp Flotante -->
-  <a href="https://chat.whatsapp.com/Im4wBFiyQwdFxHy7dIWoIR" target="_blank" class="whatsapp-float" style="display: none;" id="wa-btn">
-    <div class="wa-icon-circle">
-      <svg viewBox="0 0 24 24"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm.01 1.67c2.2 0 4.26.86 5.82 2.42a8.17 8.17 0 0 1 2.41 5.82c0 4.54-3.7 8.24-8.24 8.24-1.44 0-2.85-.38-4.09-1.11l-.29-.17-3.05.8 0.82-2.97-.19-.3a8.21 8.21 0 0 1-1.26-4.48c0-4.54 3.7-8.24 8.24-8.24zm4.52 11.59c-.25-.12-1.47-.72-1.7-.8-.23-.08-.39-.12-.56.12-.17.25-.64.8-.79.97-.14.17-.29.19-.54.07-.25-.12-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.12.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.11-.23-.17-.48-.29z"/></svg>
+  <!-- Modal para ver el perfil de otros -->
+  <div class="modal-overlay" id="user-modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="cerrarModal()">✕</button>
+      <img src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" class="profile-avatar-large" />
+      <div class="profile-username" id="modal-username">@Usuario</div>
+      <div class="modal-bio" id="modal-bio">Cargando biografía...</div>
     </div>
-    <span class="wa-text">Únete a nuestro grupo de WhatsApp</span>
-  </a>
+  </div>
 
   <script>
     const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
@@ -216,60 +203,65 @@
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let usuarioActual = null;
+    let usernameActual = "";
     let modoRegistro = false;
 
-    // --- SISTEMA DE AUTENTICACIÓN ---
+    // --- AUTENTICACIÓN ---
     async function verificarSesion() {
       const { data: { session } } = await db.auth.getSession();
       if (session) {
         usuarioActual = session.user;
+        usernameActual = usuarioActual.user_metadata.username;
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'block';
-        document.getElementById('wa-btn').style.display = 'flex';
-        document.getElementById('display-alias').innerText = usuarioActual.user_metadata.alias || "Usuario Anónimo";
+        document.getElementById('display-alias').innerText = "@" + usernameActual;
+        document.getElementById('mi-username').innerText = "@" + usernameActual;
         cargarPosts();
+        cargarMiPerfil();
       } else {
         document.getElementById('auth-screen').style.display = 'flex';
         document.getElementById('app-screen').style.display = 'none';
-        document.getElementById('wa-btn').style.display = 'none';
       }
     }
 
     function toggleAuthMode() {
       modoRegistro = !modoRegistro;
       document.getElementById('auth-title').innerText = modoRegistro ? "Crear Perfil Nuevo 👤" : "Entrar al Muro 🗿";
-      document.getElementById('auth-alias').style.display = modoRegistro ? "block" : "none";
       document.getElementById('auth-main-btn').innerText = modoRegistro ? "Registrarme" : "Entrar";
       document.getElementById('auth-toggle-btn').innerText = modoRegistro ? "¿Ya tienes perfil? Inicia sesión" : "¿No tienes perfil? Regístrate aquí";
     }
 
     async function iniciarSesion() {
-      const telefono = document.getElementById('auth-phone').value.trim();
+      const usernameInput = document.getElementById('auth-username').value.trim();
       const password = document.getElementById('auth-pass').value;
-      const alias = document.getElementById('auth-alias').value.trim();
+      if (!usernameInput || !password) return alert("Llena los campos rey.");
       
-      if (!telefono || !password) return alert("Llena los campos rey.");
-      
-      // El Truco Hacker: Convertimos el celular en un "correo falso"
-      const fakeEmail = telefono + "@muro.com";
+      const fakeEmail = usernameInput.toLowerCase() + "@muro.com";
       const btn = document.getElementById('auth-main-btn');
       btn.innerText = "Cargando...";
 
       if (modoRegistro) {
-        if (!alias) return alert("Ponte un alias.");
+        // Registrar en Auth
         const { data, error } = await db.auth.signUp({
           email: fakeEmail,
           password: password,
-          options: { data: { alias: alias } }
+          options: { data: { username: usernameInput } }
         });
-        if (error) alert("Error al registrar: " + error.message);
-        else { alert("Perfil creado con éxito!"); verificarSesion(); }
+        
+        if (error) {
+          alert("Error: " + error.message);
+        } else if (data.user) {
+          // Crear su perfil en la tabla de base de datos automáticamente
+          await db.from('perfiles').insert([{ 
+            id: data.user.id, 
+            username: usernameInput 
+          }]);
+          alert("¡Perfil creado con éxito!");
+          verificarSesion();
+        }
       } else {
-        const { data, error } = await db.auth.signInWithPassword({
-          email: fakeEmail,
-          password: password
-        });
-        if (error) alert("Credenciales incorrectas o perfil no existe.");
+        const { data, error } = await db.auth.signInWithPassword({ email: fakeEmail, password: password });
+        if (error) alert("Credenciales incorrectas.");
         else verificarSesion();
       }
       btn.innerText = modoRegistro ? "Registrarme" : "Entrar";
@@ -281,19 +273,67 @@
       verificarSesion();
     }
 
-    // --- CÓDIGO DEL MURO ---
+    // --- NAVEGACIÓN ---
     let vistaActual = 'feed';
-    let postsData = [];
-    let imagenBase64 = null;
-
     window.cambiarVista = function(vista) {
       vistaActual = vista;
       document.getElementById('tab-feed').classList.toggle('active', vista === 'feed');
       document.getElementById('tab-cine').classList.toggle('active', vista === 'cine');
-      renderPosts();
+      document.getElementById('tab-perfil').classList.toggle('active', vista === 'perfil');
+      
+      if(vista === 'perfil') {
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('mi-perfil-container').style.display = 'block';
+      } else {
+        document.getElementById('main-content').style.display = 'block';
+        document.getElementById('mi-perfil-container').style.display = 'none';
+        renderPosts();
+      }
     };
 
-    // Procesar Imagen
+    // --- MI PERFIL ---
+    async function cargarMiPerfil() {
+      const { data, error } = await db.from('perfiles').select('biografia').eq('id', usuarioActual.id).single();
+      if(data && data.biografia) {
+        document.getElementById('mi-biografia').value = data.biografia;
+      }
+    }
+
+    window.guardarBiografia = async function() {
+      const bio = document.getElementById('mi-biografia').value.trim();
+      const { error } = await db.from('perfiles').update({ biografia: bio }).eq('id', usuarioActual.id);
+      if(error) alert("Error al guardar: " + error.message);
+      else alert("¡Biografía actualizada!");
+    }
+
+    // --- VER PERFIL DE OTROS (MODAL) ---
+    window.abrirPerfil = async function(usernameClick) {
+      document.getElementById('modal-username').innerText = "@" + usernameClick;
+      document.getElementById('modal-bio').innerText = "Cargando...";
+      document.getElementById('user-modal').style.display = 'flex';
+
+      const { data, error } = await db.from('perfiles').select('biografia').eq('username', usernameClick).single();
+      
+      if(data) {
+        document.getElementById('modal-bio').innerText = data.biografia || "Este usuario aún no tiene biografía.";
+      } else {
+        document.getElementById('modal-bio').innerText = "Perfil no encontrado.";
+      }
+    }
+
+    window.cerrarModal = function() {
+      document.getElementById('user-modal').style.display = 'none';
+    }
+
+    // Cerrar modal tocando afuera
+    document.getElementById('user-modal').addEventListener('click', function(e) {
+      if(e.target === this) cerrarModal();
+    });
+
+    // --- SISTEMA DE POSTS ---
+    let postsData = [];
+    let imagenBase64 = null;
+
     document.getElementById("input-file").addEventListener("change", function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -303,8 +343,7 @@
         img.src = event.target.result;
         img.onload = function() {
           const canvas = document.createElement("canvas");
-          const MAX_WIDTH = 800;
-          let width = img.width, height = img.height;
+          const MAX_WIDTH = 800; let width = img.width, height = img.height;
           if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
           canvas.width = width; canvas.height = height;
           canvas.getContext("2d").drawImage(img, 0, 0, width, height);
@@ -317,18 +356,17 @@
     });
 
     window.quitarImagen = function() {
-      imagenBase64 = null;
-      document.getElementById("input-file").value = "";
+      imagenBase64 = null; document.getElementById("input-file").value = "";
       document.getElementById("preview-box").style.display = "none";
     };
 
-    // Cargar y Renderizar
     async function cargarPosts() {
       const { data, error } = await db.from("proyectadas").select("*").order("created_at", { ascending: false });
       if (!error) { postsData = data; renderPosts(); }
     }
 
     function renderPosts() {
+      if(vistaActual === 'perfil') return; // No renderizar si estoy en mi perfil
       const container = document.getElementById("posts-container");
       let lista = [...postsData];
       if (vistaActual === 'cine') {
@@ -336,14 +374,14 @@
       }
       if (lista.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 20px;">No hay nada todavía.</div>`;
 
-      container.innerHTML = lista.map((post, idx) => {
+      container.innerHTML = lista.map((post) => {
         let imgHtml = post.imagen_url ? `<div class="post-image-box"><img src="${post.imagen_url}"/></div>` : "";
         return `
           <div class="post-card" id="card-${post.id}">
             <div class="post-header">
-              <img class="avatar" src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" />
+              <img class="avatar" src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" onclick="abrirPerfil('${escapeHtml(post.autor)}')" />
               <div>
-                <div class="author-name">${escapeHtml(post.autor)}</div>
+                <div class="author-name" onclick="abrirPerfil('${escapeHtml(post.autor)}')">@${escapeHtml(post.autor)}</div>
                 <div style="font-size: 11px; color: var(--text-muted);">
                   ${new Date(post.created_at).toLocaleDateString()} • #${escapeHtml(post.categoria)}
                 </div>
@@ -358,6 +396,7 @@
                 <button class="react-btn" onclick="votar(${post.id}, 'fuego')">🚬 <span>${post.fuego_count || 0}</span></button>
                 <button class="react-btn" onclick="votar(${post.id}, 'skull')">💀 <span>${post.skull_count || 0}</span></button>
               </div>
+              <button class="btn-capture" onclick="descargarTarjeta(${post.id})">📸 Captura</button>
             </div>
           </div>
         `;
@@ -371,20 +410,25 @@
       cargarPosts();
     };
 
-    // Publicar Post
+    window.descargarTarjeta = function(id) {
+      const card = document.getElementById(`card-${id}`);
+      html2canvas(card, { backgroundColor: "#12161f", scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement("a"); link.download = `proyectada-${id}.png`;
+        link.href = canvas.toDataURL("image/png"); link.click();
+      });
+    };
+
     document.getElementById("proyectada-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("submit-btn");
       btn.disabled = true; btn.innerText = "Publicando...";
 
-      // Toma el alias directamente del usuario logueado
-      const autor = usuarioActual.user_metadata.alias;
       const contenido = document.getElementById("contenido").value.trim();
       const categoria = document.getElementById("categoria").value;
       const hype_level = document.getElementById("hype-range").value;
 
       await db.from("proyectadas").insert([{
-        autor, contenido, categoria, hype_level, imagen_url: imagenBase64
+        autor: usernameActual, contenido, categoria, hype_level, imagen_url: imagenBase64
       }]);
 
       document.getElementById("contenido").value = "";
@@ -395,10 +439,8 @@
 
     function escapeHtml(str) { return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
-    // Suscripción Realtime
     try { db.channel("muro-realtime").on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, cargarPosts).subscribe(); } catch(e){}
 
-    // Arrancar
     verificarSesion();
   </script>
 </body>
