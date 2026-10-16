@@ -19,14 +19,10 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: var(--bg);
-      color: var(--text);
+      background: var(--bg); color: var(--text);
       font-family: system-ui, -apple-system, sans-serif;
-      padding: 20px 14px 90px 14px; 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
+      padding: 20px 14px 90px 14px; display: flex; flex-direction: column;
+      align-items: center; min-height: 100vh;
     }
     .container { width: 100%; max-width: 650px; }
 
@@ -50,24 +46,18 @@
     .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; }
     .auth-switch { color: var(--accent); font-size: 13px; cursor: pointer; text-align: center; }
     .auth-switch:hover { text-decoration: underline; }
-    #auth-error { color: #f85149; font-size: 13px; margin-bottom: 12px; text-align: center; display: none; background: #3a1515; padding: 8px; border-radius: 6px; width: 100%;}
+    
+    /* ESTILOS DEL ERROR */
+    #auth-error { color: #f85149; font-size: 13px; margin-bottom: 12px; text-align: center; display: none; background: #3a1515; padding: 10px; border-radius: 6px; width: 100%; border: 1px solid #f85149;}
 
     /* ================= MURO PRINCIPAL ================= */
     #app-screen { display: none; width: 100%; }
-
-    .hero-banner {
-      background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; 
-      overflow: hidden; margin-bottom: 24px; text-align: center; position: relative;
-    }
+    .hero-banner { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; text-align: center; position: relative; }
     .hero-banner img { width: 100%; height: 200px; object-fit: cover; display: block; filter: brightness(0.85); }
     .hero-title { padding: 16px; }
     .hero-title h1 { font-size: 23px; color: #e6edf3; display: flex; justify-content: center; gap: 10px; }
     .hero-title p { font-size: 13px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
-    
-    .logout-btn {
-      position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6);
-      border: 1px solid var(--border); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer;
-    }
+    .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); border: 1px solid var(--border); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
 
     form { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
     textarea, select { background: #090c10; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; width: 100%; font-family: inherit;}
@@ -116,7 +106,6 @@
     .modal-content { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 90%; max-width: 400px; text-align: center; position: relative; }
     .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
     .modal-bio { margin-top: 15px; font-size: 14px; color: var(--text); white-space: pre-wrap; line-height: 1.5; background: #090c10; padding: 12px; border-radius: 8px; border: 1px solid var(--border);}
-    
   </style>
 </head>
 <body>
@@ -125,7 +114,7 @@
   <div id="auth-screen" class="container">
     <h2 id="auth-title">Entrar al Muro 🗿</h2>
     
-    <!-- Caja de errores -->
+    <!-- Caja de errores que no desaparecerá hasta que lo arregles -->
     <div id="auth-error"></div>
 
     <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Alex_Goma)" autocomplete="off" />
@@ -137,7 +126,6 @@
 
   <!-- ================= APLICACIÓN ================= -->
   <div id="app-screen" class="container">
-    
     <div class="hero-banner">
       <img src="https://i.postimg.cc/Y2xk6G7V/Proyectado1.webp" alt="Proyectado" />
       <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
@@ -153,7 +141,7 @@
       <button class="tab-btn" id="tab-perfil" onclick="cambiarVista('perfil')">👤 Mi Perfil</button>
     </div>
 
-    <!-- Contenedor Principal (Feed + Formulario) -->
+    <!-- Feed Principal -->
     <div id="main-content">
       <form id="proyectada-form">
         <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center;">
@@ -169,7 +157,7 @@
         <textarea id="contenido" rows="3" placeholder="Suelte ese desahogo melancólico..." required></textarea>
         
         <div class="file-upload-box">
-          <label for="input-file" class="custom-file-btn">🖼️ Añadir foto (opcional)</label>
+          <label for="input-file" class="custom-file-btn">🖼️ Añadir foto</label>
           <input type="file" id="input-file" accept="image/*" />
           <div class="preview-box" id="preview-box">
             <img id="preview-img" src="" />
@@ -198,10 +186,9 @@
       <textarea id="mi-biografia" rows="4" placeholder="Escribe algo sobre ti..."></textarea>
       <button class="btn-submit" style="width: 100%; margin-top: 10px;" onclick="guardarBiografia()">Guardar Perfil</button>
     </div>
-
   </div>
 
-  <!-- Modal para ver el perfil de otros -->
+  <!-- Modal para ver perfiles -->
   <div class="modal-overlay" id="user-modal">
     <div class="modal-content">
       <button class="close-modal" onclick="cerrarModal()">✕</button>
@@ -211,21 +198,21 @@
     </div>
   </div>
 
+  <!-- SCRIPTS Y LÓGICA -->
   <script>
-    const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
-    const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
-    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    // Usando var para evitar errores de inicialización en navegadores estrictos
+    // 1. Declarar TODAS las variables globales al principio para que los botones NUNCA choquen
+    var modoRegistro = false;
     var usuarioActual = null;
     var usernameActual = "";
-    var modoRegistro = false;
     var vistaActual = 'feed';
     var postsData = [];
     var imagenBase64 = null;
+    var db = null;
+    
+    // TÚ ERES EL DUEÑO 👑
+    var OWNER_USERNAME = "Alex_Goma";
 
-    const OWNER_USERNAME = "Alex_Goma";
-
+    // 2. Funciones de UI básicas (Tienen que funcionar sin importar si la base de datos se cae)
     function escapeHtml(str) { return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
     function generarEtiquetaOwner(username) {
@@ -235,8 +222,32 @@
       return "";
     }
 
-    // --- AUTENTICACIÓN ---
+    function mostrarErrorAuth(mensaje) {
+      var errDiv = document.getElementById('auth-error');
+      errDiv.innerHTML = "<b>❌ ATENCIÓN:</b><br/>" + mensaje;
+      errDiv.style.display = 'block';
+    }
+
+    window.toggleAuthMode = function() {
+      modoRegistro = !modoRegistro;
+      document.getElementById('auth-title').innerText = modoRegistro ? "Crear Perfil Nuevo 👤" : "Entrar al Muro 🗿";
+      document.getElementById('auth-main-btn').innerText = modoRegistro ? "Registrarme" : "Entrar";
+      document.getElementById('auth-toggle-btn').innerText = modoRegistro ? "¿Ya tienes perfil? Inicia sesión" : "¿No tienes perfil? Regístrate aquí";
+      document.getElementById('auth-error').style.display = 'none';
+    };
+
+    // 3. Inicializar Base de datos de forma segura
+    if (typeof window.supabase === 'undefined') {
+      mostrarErrorAuth("Tu internet o navegador está bloqueando la base de datos.<br/><b>Solución:</b> Usa un VPN (como ProtonVPN o 1.1.1.1) y recarga la página.");
+    } else {
+      const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
+      const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
+      db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    }
+
+    // 4. Lógica de Autenticación
     async function verificarSesion() {
+      if (!db) return;
       const { data: { session } } = await db.auth.getSession();
       if (session) {
         usuarioActual = session.user;
@@ -244,7 +255,6 @@
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'block';
         
-        // Poner etiqueta Owner si aplica
         const ownerTag = generarEtiquetaOwner(usernameActual);
         document.getElementById('display-alias').innerHTML = "@" + escapeHtml(usernameActual) + ownerTag;
         document.getElementById('mi-username').innerHTML = "@" + escapeHtml(usernameActual) + ownerTag;
@@ -257,21 +267,9 @@
       }
     }
 
-    window.toggleAuthMode = function() {
-      modoRegistro = !modoRegistro;
-      document.getElementById('auth-title').innerText = modoRegistro ? "Crear Perfil Nuevo 👤" : "Entrar al Muro 🗿";
-      document.getElementById('auth-main-btn').innerText = modoRegistro ? "Registrarme" : "Entrar";
-      document.getElementById('auth-toggle-btn').innerText = modoRegistro ? "¿Ya tienes perfil? Inicia sesión" : "¿No tienes perfil? Regístrate aquí";
-      document.getElementById('auth-error').style.display = 'none';
-    };
-
-    function mostrarErrorAuth(mensaje) {
-      const errDiv = document.getElementById('auth-error');
-      errDiv.innerText = "❌ " + mensaje;
-      errDiv.style.display = 'block';
-    }
-
     window.iniciarSesion = async function() {
+      if (!db) return mostrarErrorAuth("Supabase no ha cargado. Verifica tu conexión o enciende un VPN.");
+      
       const usernameInput = document.getElementById('auth-username').value.trim();
       const password = document.getElementById('auth-pass').value;
       const btn = document.getElementById('auth-main-btn');
@@ -279,11 +277,11 @@
       document.getElementById('auth-error').style.display = 'none';
 
       if (!usernameInput || !password) {
-        return mostrarErrorAuth("Llena ambos campos, por favor.");
+        return mostrarErrorAuth("Llena el usuario y la contraseña por favor.");
       }
 
       if (password.length < 6) {
-        return mostrarErrorAuth("La contraseña debe tener al menos 6 caracteres.");
+        return mostrarErrorAuth("La contraseña debe tener mínimo 6 caracteres.");
       }
       
       const fakeEmail = usernameInput.toLowerCase() + "@muro.com";
@@ -300,7 +298,7 @@
           });
           
           if (error) {
-            if(error.message.includes("already registered")) throw new Error("Ese nombre de usuario ya está en uso.");
+            if(error.message.includes("already registered")) throw new Error("Ese nombre de usuario ya está registrado. Intenta iniciar sesión.");
             throw error;
           }
           
@@ -311,7 +309,7 @@
           }
         } else {
           const { data, error } = await db.auth.signInWithPassword({ email: fakeEmail, password: password });
-          if (error) throw new Error("Credenciales incorrectas o la cuenta no existe.");
+          if (error) throw new Error("La cuenta no existe o la contraseña es incorrecta.");
           await verificarSesion();
         }
       } catch (err) {
@@ -323,12 +321,12 @@
     };
 
     window.cerrarSesion = async function() {
-      await db.auth.signOut();
+      if(db) await db.auth.signOut();
       usuarioActual = null;
       verificarSesion();
     };
 
-    // --- NAVEGACIÓN ---
+    // 5. Navegación, Perfiles y Feed
     window.cambiarVista = function(vista) {
       vistaActual = vista;
       document.getElementById('tab-feed').classList.toggle('active', vista === 'feed');
@@ -345,12 +343,10 @@
       }
     };
 
-    // --- MI PERFIL ---
     async function cargarMiPerfil() {
+      if(!db) return;
       const { data, error } = await db.from('perfiles').select('biografia').eq('id', usuarioActual.id).single();
-      if(data && data.biografia) {
-        document.getElementById('mi-biografia').value = data.biografia;
-      }
+      if(data && data.biografia) document.getElementById('mi-biografia').value = data.biografia;
     }
 
     window.guardarBiografia = async function() {
@@ -360,20 +356,16 @@
       else alert("¡Biografía actualizada!");
     };
 
-    // --- VER PERFIL DE OTROS (MODAL) ---
     window.abrirPerfil = async function(usernameClick) {
       const ownerTag = generarEtiquetaOwner(usernameClick);
       document.getElementById('modal-username').innerHTML = "@" + escapeHtml(usernameClick) + ownerTag;
-      document.getElementById('modal-bio').innerText = "Cargando...";
+      document.getElementById('modal-bio').innerText = "Cargando biografía...";
       document.getElementById('user-modal').style.display = 'flex';
 
       const { data, error } = await db.from('perfiles').select('biografia').eq('username', usernameClick).single();
       
-      if(data) {
-        document.getElementById('modal-bio').innerText = data.biografia || "Este usuario aún no tiene biografía.";
-      } else {
-        document.getElementById('modal-bio').innerText = "Perfil no encontrado.";
-      }
+      if(data) document.getElementById('modal-bio').innerText = data.biografia || "Este usuario aún no tiene biografía.";
+      else document.getElementById('modal-bio').innerText = "Perfil no encontrado.";
     };
 
     window.cerrarModal = function() {
@@ -384,7 +376,6 @@
       if(e.target === this) cerrarModal();
     });
 
-    // --- SISTEMA DE POSTS ---
     document.getElementById("input-file").addEventListener("change", function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -412,6 +403,7 @@
     };
 
     async function cargarPosts() {
+      if(!db) return;
       const { data, error } = await db.from("proyectadas").select("*").order("created_at", { ascending: false });
       if (!error) { postsData = data; renderPosts(); }
     }
@@ -423,7 +415,7 @@
       if (vistaActual === 'cine') {
         lista.sort((a, b) => ((b.chad_count||0)+(b.fuego_count||0)+(b.skull_count||0)) - ((a.chad_count||0)+(a.fuego_count||0)+(a.skull_count||0)));
       }
-      if (lista.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 20px;">No hay nada todavía.</div>`;
+      if (lista.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 20px;">No hay desahogos todavía.</div>`;
 
       container.innerHTML = lista.map((post) => {
         let imgHtml = post.imagen_url ? `<div class="post-image-box"><img src="${post.imagen_url}"/></div>` : "";
@@ -457,7 +449,7 @@
     }
 
     window.votar = async function(id, tipo) {
-      if (localStorage.getItem(`voto_${id}_${tipo}`)) return;
+      if (!db || localStorage.getItem(`voto_${id}_${tipo}`)) return;
       localStorage.setItem(`voto_${id}_${tipo}`, "true");
       await db.rpc("reaccionar", { post_id: id, tipo_reaccion: tipo });
       cargarPosts();
@@ -473,6 +465,7 @@
 
     document.getElementById("proyectada-form").addEventListener("submit", async (e) => {
       e.preventDefault();
+      if(!db) return;
       const btn = document.getElementById("submit-btn");
       btn.disabled = true; btn.innerText = "Publicando...";
 
@@ -490,9 +483,10 @@
       btn.disabled = false; btn.innerText = "Soltar Proyección";
     });
 
-    try { db.channel("muro-realtime").on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, cargarPosts).subscribe(); } catch(e){}
-
-    verificarSesion();
+    if(db) {
+      try { db.channel("muro-realtime").on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, cargarPosts).subscribe(); } catch(e){}
+      verificarSesion();
+    }
   </script>
 </body>
 </html>
