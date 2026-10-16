@@ -46,9 +46,11 @@
       width: 100%; background: #1f364d; color: #fff; font-weight: bold; border: 1px solid #388bfd44; 
       padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; margin-bottom: 10px;
     }
-    .auth-btn:hover { background: #264766; }
+    .auth-btn:hover:not(:disabled) { background: #264766; }
+    .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; }
     .auth-switch { color: var(--accent); font-size: 13px; cursor: pointer; text-align: center; }
     .auth-switch:hover { text-decoration: underline; }
+    #auth-error { color: #f85149; font-size: 13px; margin-bottom: 12px; text-align: center; display: none; background: #3a1515; padding: 8px; border-radius: 6px; width: 100%;}
 
     /* ================= MURO PRINCIPAL ================= */
     #app-screen { display: none; width: 100%; }
@@ -115,8 +117,13 @@
   <!-- ================= LOGIN / REGISTRO ================= -->
   <div id="auth-screen" class="container">
     <h2 id="auth-title">Entrar al Muro 🗿</h2>
+    
+    <!-- Caja de errores -->
+    <div id="auth-error"></div>
+
     <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Goma)" autocomplete="off" />
     <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña :3" />
+    
     <button class="auth-btn" id="auth-main-btn" onclick="iniciarSesion()">Entrar</button>
     <div class="auth-switch" id="auth-toggle-btn" onclick="toggleAuthMode()">¿No tienes perfil? Regístrate aquí</div>
   </div>
@@ -206,7 +213,7 @@
     let usernameActual = "";
     let modoRegistro = false;
 
-    // --- AUTENTICACIÓN ---
+    // --- AUTENTICACIÓN CORREGIDA ---
     async function verificarSesion() {
       const { data: { session } } = await db.auth.getSession();
       if (session) {
@@ -229,42 +236,66 @@
       document.getElementById('auth-title').innerText = modoRegistro ? "Crear Perfil Nuevo 👤" : "Entrar al Muro 🗿";
       document.getElementById('auth-main-btn').innerText = modoRegistro ? "Registrarme" : "Entrar";
       document.getElementById('auth-toggle-btn').innerText = modoRegistro ? "¿Ya tienes perfil? Inicia sesión" : "¿No tienes perfil? Regístrate aquí";
+      document.getElementById('auth-error').style.display = 'none'; // Limpiamos errores al cambiar
+    }
+
+    function mostrarErrorAuth(mensaje) {
+      const errDiv = document.getElementById('auth-error');
+      errDiv.innerText = "❌ " + mensaje;
+      errDiv.style.display = 'block';
     }
 
     async function iniciarSesion() {
       const usernameInput = document.getElementById('auth-username').value.trim();
       const password = document.getElementById('auth-pass').value;
-      if (!usernameInput || !password) return alert("Llena los campos rey.");
+      const btn = document.getElementById('auth-main-btn');
+      
+      document.getElementById('auth-error').style.display = 'none';
+
+      if (!usernameInput || !password) {
+        return mostrarErrorAuth("Llena ambos campos, por favor.");
+      }
+
+      // Supabase exige que las contraseñas tengan al menos 6 caracteres
+      if (password.length < 6) {
+        return mostrarErrorAuth("La contraseña debe tener al menos 6 caracteres.");
+      }
       
       const fakeEmail = usernameInput.toLowerCase() + "@muro.com";
-      const btn = document.getElementById('auth-main-btn');
+      
       btn.innerText = "Cargando...";
+      btn.disabled = true;
 
-      if (modoRegistro) {
-        // Registrar en Auth
-        const { data, error } = await db.auth.signUp({
-          email: fakeEmail,
-          password: password,
-          options: { data: { username: usernameInput } }
-        });
-        
-        if (error) {
-          alert("Error: " + error.message);
-        } else if (data.user) {
-          // Crear su perfil en la tabla de base de datos automáticamente
-          await db.from('perfiles').insert([{ 
-            id: data.user.id, 
-            username: usernameInput 
-          }]);
-          alert("¡Perfil creado con éxito!");
-          verificarSesion();
+      try {
+        if (modoRegistro) {
+          const { data, error } = await db.auth.signUp({
+            email: fakeEmail,
+            password: password,
+            options: { data: { username: usernameInput } }
+          });
+          
+          if (error) {
+            if(error.message.includes("already registered")) throw new Error("Ese nombre de usuario ya está en uso.");
+            throw error;
+          }
+          
+          if (data.user) {
+            // Creamos su perfil público en la base de datos
+            await db.from('perfiles').insert([{ id: data.user.id, username: usernameInput }]);
+            alert("¡Perfil creado con éxito!");
+            await verificarSesion();
+          }
+        } else {
+          const { data, error } = await db.auth.signInWithPassword({ email: fakeEmail, password: password });
+          if (error) throw new Error("Credenciales incorrectas o la cuenta no existe.");
+          await verificarSesion();
         }
-      } else {
-        const { data, error } = await db.auth.signInWithPassword({ email: fakeEmail, password: password });
-        if (error) alert("Credenciales incorrectas.");
-        else verificarSesion();
+      } catch (err) {
+        mostrarErrorAuth(err.message);
+      } finally {
+        btn.innerText = modoRegistro ? "Registrarme" : "Entrar";
+        btn.disabled = false;
       }
-      btn.innerText = modoRegistro ? "Registrarme" : "Entrar";
     }
 
     async function cerrarSesion() {
@@ -325,7 +356,6 @@
       document.getElementById('user-modal').style.display = 'none';
     }
 
-    // Cerrar modal tocando afuera
     document.getElementById('user-modal').addEventListener('click', function(e) {
       if(e.target === this) cerrarModal();
     });
