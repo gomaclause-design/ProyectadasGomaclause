@@ -14,7 +14,6 @@
       --card-bg: #12161f;
       --border: #252d3a;
       --accent: #79a8d8;
-      --sad-blue: #58a6ff;
       --text: #c9d1d9;
       --text-muted: #6e7681;
     }
@@ -30,7 +29,7 @@
     }
     .container { width: 100%; max-width: 650px; }
 
-    /* Cabecera con la primera imagen */
+    /* Cabecera */
     .hero-banner {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -46,9 +45,7 @@
       display: block;
       filter: brightness(0.85) contrast(1.05);
     }
-    .hero-title {
-      padding: 16px;
-    }
+    .hero-title { padding: 16px; }
     .hero-title h1 {
       font-size: 23px;
       color: #e6edf3;
@@ -75,7 +72,7 @@
       gap: 12px;
       margin-bottom: 24px;
     }
-    input[type="text"], input[type="url"], textarea, select {
+    input[type="text"], textarea, select {
       background: #090c10;
       border: 1px solid var(--border);
       color: var(--text);
@@ -100,7 +97,73 @@
       cursor: pointer;
     }
 
-    /* Slider de Nivel de Bajón */
+    /* Input personalizado para fotos de la galería */
+    .file-upload-box {
+      border: 1px dashed var(--border);
+      padding: 12px;
+      border-radius: 8px;
+      background: #090c10;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .file-btn-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .custom-file-btn {
+      background: #182230;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .custom-file-btn:hover { background: #212d40; }
+    #input-file { display: none; }
+    .file-status { font-size: 12px; color: var(--text-muted); }
+
+    /* Previsualización antes de mandar */
+    .preview-box {
+      display: none;
+      position: relative;
+      width: 100%;
+      max-height: 220px;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .preview-box img {
+      width: 100%;
+      height: 100%;
+      max-height: 220px;
+      object-fit: cover;
+      display: block;
+    }
+    .btn-remove-img {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid #f85149;
+      color: #f85149;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Slider */
     .hype-container {
       background: #090c10;
       border: 1px solid var(--border);
@@ -131,7 +194,7 @@
     }
     .btn-submit:hover { background: #264766; color: #fff; }
 
-    /* Barra de filtros */
+    /* Pestañas */
     .nav-tabs {
       display: flex;
       gap: 10px;
@@ -155,7 +218,7 @@
       border: 1px solid var(--border);
     }
 
-    /* Tarjetas del Feed */
+    /* Tarjetas */
     .post-card {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -195,7 +258,6 @@
       color: #d0d7de;
     }
 
-    /* Imagen adjunta en el post */
     .post-image-box {
       width: 100%;
       max-height: 380px;
@@ -213,7 +275,6 @@
       display: block;
     }
 
-    /* Barra de bajón en la tarjeta */
     .card-hype-bar {
       height: 3px;
       border-radius: 2px;
@@ -226,7 +287,6 @@
       background: linear-gradient(90deg, #388bfd, #8957e5);
     }
 
-    /* Acciones inferiores */
     .post-footer {
       display: flex;
       justify-content: space-between;
@@ -255,7 +315,7 @@
 
   <div class="container">
     
-    <!-- Banner Principal (Primera Imagen) -->
+    <!-- Banner Principal -->
     <div class="hero-banner">
       <img src="https://i.postimg.cc/Y2xk6G7V/Proyectado1.webp" alt="Proyectado Despecho" />
       <div class="hero-title">
@@ -285,10 +345,23 @@
 
       <textarea id="contenido" rows="3" placeholder="Suelte ese desahogo melancólico que lleva guardado..." required></textarea>
 
-      <!-- Campo de Imagen Opcional -->
-      <input type="url" id="imagen-url" placeholder="Enlace de imagen o meme (opcional - https://...)" />
+      <!-- Selector de foto de galería -->
+      <div class="file-upload-box">
+        <div class="file-btn-wrapper">
+          <label for="input-file" class="custom-file-btn">
+            🖼️ Elegir foto de galería
+          </label>
+          <input type="file" id="input-file" accept="image/*" />
+          <span class="file-status" id="file-status">Ninguna imagen seleccionada</span>
+        </div>
+        
+        <div class="preview-box" id="preview-box">
+          <img id="preview-img" src="" alt="Previsualización" />
+          <button type="button" class="btn-remove-img" onclick="quitarImagen()">✕</button>
+        </div>
+      </div>
 
-      <!-- Medidor de Bajón Emocional -->
+      <!-- Medidor de Bajón -->
       <div class="hype-container">
         <div class="hype-header">
           <span>Nivel de Dolor / Bajón:</span>
@@ -297,7 +370,7 @@
         <input type="range" id="hype-range" min="1" max="100" value="50" oninput="actualizarHypeText(this.value)" />
       </div>
 
-      <button type="submit" class="btn-submit">Soltar Proyección Sad</button>
+      <button type="submit" class="btn-submit" id="submit-btn">Soltar Proyección Sad</button>
     </form>
 
     <!-- Pestañas de Vista -->
@@ -318,8 +391,8 @@
 
     let vistaActual = 'feed';
     let postsData = [];
+    let imagenBase64 = null;
 
-    // Avatares asignados para los posts (alternando las otras 2 imágenes)
     const AVATAR_1 = "https://i.postimg.cc/y6TBmgK2/Proyectado2.webp";
     const AVATAR_2 = "https://i.postimg.cc/PqZnPNKV/670b134a-0bde-4bde-960d-cfb4aa4eb982.jpg";
 
@@ -333,6 +406,52 @@
       document.getElementById('tab-cine').classList.toggle('active', vista === 'cine');
       renderPosts();
     }
+
+    // Procesar y comprimir la imagen de la galería
+    document.getElementById("input-file").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        const img = new Image();
+        img.src = event.target.result;
+        img.onload = function() {
+          // Comprimir a máximo 800px para que suba instantáneo y no pese
+          const canvas = document.createElement("canvas");
+          const MAX_WIDTH = 800;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, width, height);
+
+          // Convertir a JPEG optimizado
+          imagenBase64 = canvas.toDataURL("image/jpeg", 0.75);
+
+          // Mostrar previsualización
+          document.getElementById("preview-img").src = imagenBase64;
+          document.getElementById("preview-box").style.display = "block";
+          document.getElementById("file-status").innerText = file.name;
+        };
+      };
+      reader.readAsDataURL(file);
+    });
+
+    window.quitarImagen = function() {
+      imagenBase64 = null;
+      document.getElementById("input-file").value = "";
+      document.getElementById("preview-box").style.display = "none";
+      document.getElementById("preview-img").src = "";
+      document.getElementById("file-status").innerText = "Ninguna imagen seleccionada";
+    };
 
     async function cargarPosts() {
       const { data, error } = await supabase
@@ -373,7 +492,7 @@
         if (post.imagen_url && post.imagen_url.trim() !== "") {
           postImgHtml = `
             <div class="post-image-box">
-              <img src="${escapeHtml(post.imagen_url)}" alt="Adjunto" loading="lazy" onerror="this.parentElement.style.display='none'" />
+              <img src="${post.imagen_url}" alt="Adjunto" loading="lazy" />
             </div>
           `;
         }
@@ -448,25 +567,31 @@
 
     document.getElementById("proyectada-form").addEventListener("submit", async (e) => {
       e.preventDefault();
+      const btn = document.getElementById("submit-btn");
+      btn.disabled = true;
+      btn.innerText = "Publicando...";
+
       const isAnon = document.getElementById("anonimo-check").checked;
       const autorInput = document.getElementById("autor").value.trim();
       const autor = isAnon ? "@ProyectadoAnonimo" : autorInput;
       const contenido = document.getElementById("contenido").value.trim();
       const categoria = document.getElementById("categoria").value;
       const hype_level = parseInt(document.getElementById("hype-range").value);
-      const imagen_url = document.getElementById("imagen-url").value.trim() || null;
 
       const { error } = await supabase.from("proyectadas").insert([{
         autor,
         contenido,
         categoria,
         hype_level,
-        imagen_url
+        imagen_url: imagenBase64
       }]);
+
+      btn.disabled = false;
+      btn.innerText = "Soltar Proyección Sad";
 
       if (!error) {
         document.getElementById("contenido").value = "";
-        document.getElementById("imagen-url").value = "";
+        quitarImagen();
         cargarPosts();
       } else {
         alert("Fallo al postear: " + error.message);
