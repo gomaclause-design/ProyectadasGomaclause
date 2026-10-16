@@ -10,14 +10,13 @@
 
   <style>
     :root {
-      --bg: #0b0e14;
-      --card-bg: #151b23;
-      --border: #30363d;
-      --accent: #58a6ff;
-      --gold: #f1e05a;
-      --red: #f85149;
-      --text: #e6edf3;
-      --text-muted: #8b949e;
+      --bg: #090c10;
+      --card-bg: #12161f;
+      --border: #252d3a;
+      --accent: #79a8d8;
+      --sad-blue: #58a6ff;
+      --text: #c9d1d9;
+      --text-muted: #6e7681;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -31,7 +30,7 @@
     }
     .container { width: 100%; max-width: 650px; }
 
-    /* Cabecera con imagen destacada */
+    /* Cabecera con la primera imagen */
     .hero-banner {
       background: var(--card-bg);
       border: 1px solid var(--border);
@@ -42,25 +41,27 @@
     }
     .hero-banner img {
       width: 100%;
-      height: 180px;
+      height: 200px;
       object-fit: cover;
       display: block;
+      filter: brightness(0.85) contrast(1.05);
     }
     .hero-title {
       padding: 16px;
     }
     .hero-title h1 {
-      font-size: 24px;
-      color: #fff;
+      font-size: 23px;
+      color: #e6edf3;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 10px;
     }
     .hero-title p {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--text-muted);
-      margin-top: 4px;
+      margin-top: 6px;
+      font-style: italic;
     }
 
     /* Formulario */
@@ -74,8 +75,8 @@
       gap: 12px;
       margin-bottom: 24px;
     }
-    input[type="text"], textarea, select, input[type="date"] {
-      background: #0d1117;
+    input[type="text"], input[type="url"], textarea, select {
+      background: #090c10;
       border: 1px solid var(--border);
       color: var(--text);
       padding: 10px 12px;
@@ -99,9 +100,9 @@
       cursor: pointer;
     }
 
-    /* Slider de Hype */
+    /* Slider de Nivel de Bajón */
     .hype-container {
-      background: #0d1117;
+      background: #090c10;
       border: 1px solid var(--border);
       padding: 10px 14px;
       border-radius: 6px;
@@ -115,22 +116,22 @@
     }
     input[type="range"] {
       width: 100%;
-      accent-color: #f78166;
+      accent-color: #79a8d8;
     }
 
     .btn-submit {
-      background: #238636;
-      color: white;
+      background: #1f364d;
+      color: #c9d1d9;
       font-weight: bold;
-      border: none;
+      border: 1px solid #388bfd44;
       padding: 12px;
       border-radius: 6px;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: all 0.2s;
     }
-    .btn-submit:hover { background: #2ea043; }
+    .btn-submit:hover { background: #264766; color: #fff; }
 
-    /* Barra de filtros (Feed vs Proyector de cine) */
+    /* Barra de filtros */
     .nav-tabs {
       display: flex;
       gap: 10px;
@@ -142,7 +143,7 @@
       background: transparent;
       border: none;
       color: var(--text-muted);
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       padding: 8px 12px;
@@ -170,11 +171,11 @@
       margin-bottom: 10px;
     }
     .avatar {
-      width: 40px;
-      height: 40px;
+      width: 42px;
+      height: 42px;
       border-radius: 50%;
       object-fit: cover;
-      border: 2px solid var(--accent);
+      border: 2px solid #30363d;
     }
     .user-info { flex: 1; }
     .author-name { font-weight: bold; font-size: 15px; color: var(--accent); }
@@ -182,42 +183,47 @@
       font-size: 11px;
       padding: 2px 8px;
       border-radius: 12px;
-      background: #21262d;
+      background: #182230;
       color: #79c0ff;
       border: 1px solid #388bfd33;
     }
     .post-body {
       font-size: 15px;
-      line-height: 1.5;
+      line-height: 1.6;
       white-space: pre-wrap;
       margin-bottom: 12px;
+      color: #d0d7de;
     }
 
-    /* Hype bar en la tarjeta */
+    /* Imagen adjunta en el post */
+    .post-image-box {
+      width: 100%;
+      max-height: 380px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      background: #090c10;
+      border: 1px solid var(--border);
+    }
+    .post-image-box img {
+      width: 100%;
+      height: 100%;
+      max-height: 380px;
+      object-fit: cover;
+      display: block;
+    }
+
+    /* Barra de bajón en la tarjeta */
     .card-hype-bar {
-      height: 4px;
+      height: 3px;
       border-radius: 2px;
-      background: #21262d;
+      background: #182230;
       margin-bottom: 12px;
       overflow: hidden;
     }
     .card-hype-fill {
       height: 100%;
-      background: linear-gradient(90deg, #58a6ff, #f78166);
-    }
-
-    /* Cápsula del tiempo pill */
-    .capsule-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #1c2128;
-      border: 1px solid #d29922;
-      color: var(--gold);
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius: 6px;
-      margin-bottom: 12px;
+      background: linear-gradient(90deg, #388bfd, #8957e5);
     }
 
     /* Acciones inferiores */
@@ -241,7 +247,7 @@
       align-items: center;
       gap: 4px;
     }
-    .react-btn:hover, .btn-capture:hover { background: #21262d; }
+    .react-btn:hover, .btn-capture:hover { background: #1c2128; }
     .react-btn.reacted { border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
@@ -249,25 +255,26 @@
 
   <div class="container">
     
-    <!-- Banner Principal -->
+    <!-- Banner Principal (Primera Imagen) -->
     <div class="hero-banner">
-      <img src="https://i.postimg.cc/PqZnPNKV/670b134a-0bde-4bde-960d-cfb4aa4eb982.jpg" alt="Banner de Proyectados" />
+      <img src="https://i.postimg.cc/Y2xk6G7V/Proyectado1.webp" alt="Proyectado Despecho" />
       <div class="hero-title">
-        <h1>🗿 El Muro de las Proyectadas 🎬</h1>
-        <p>Solo alucinadas de calibre supremo.</p>
+        <h1>🌧️ El Muro de las Proyectadas 🚬</h1>
+        <p>"Desahógate aquí, no le mandes mensaje a las 3:00 AM..."</p>
       </div>
     </div>
 
     <!-- Formulario de Publicación -->
     <form id="proyectada-form">
       <div class="form-row">
-        <input type="text" id="autor" placeholder="Tu alias (ej: @proyector_chad)" required maxlength="25" />
+        <input type="text" id="autor" placeholder="Tu alias (ej: @despechado_3000)" required maxlength="25" />
         <select id="categoria">
-          <option value="General">🏷️ #General</option>
-          <option value="Gimnasio">💪 #Gimnasio</option>
-          <option value="Empresarial">💼 #Empresarial</option>
-          <option value="Gaming">🎮 #Gaming</option>
-          <option value="Delirio Puro">🛸 #DelirioPuro</option>
+          <option value="LaExtraño">💔 #LaExtraño</option>
+          <option value="Sadboy">🌧️ #Sadboy</option>
+          <option value="Insomnio">🌙 #NochesDeInsomnio</option>
+          <option value="MeIlusioné">🥀 #MeIlusioné</option>
+          <option value="Sobrepensando">💭 #Sobrepensando</option>
+          <option value="Desahogo">🕯️ #Desahogo</option>
         </select>
       </div>
 
@@ -276,32 +283,27 @@
         Postear como <strong>@ProyectadoAnonimo</strong> 🕶️
       </label>
 
-      <textarea id="contenido" rows="3" placeholder="Suelte esa proyección legendaria..." required></textarea>
+      <textarea id="contenido" rows="3" placeholder="Suelte ese desahogo melancólico que lleva guardado..." required></textarea>
 
-      <!-- Medidor de Proyección -->
+      <!-- Campo de Imagen Opcional -->
+      <input type="url" id="imagen-url" placeholder="Enlace de imagen o meme (opcional - https://...)" />
+
+      <!-- Medidor de Bajón Emocional -->
       <div class="hype-container">
         <div class="hype-header">
-          <span>Medidor de Proyección:</span>
-          <span id="hype-value" style="color: #f78166;">50% Hype</span>
+          <span>Nivel de Dolor / Bajón:</span>
+          <span id="hype-value" style="color: #79a8d8;">50% Bajón</span>
         </div>
         <input type="range" id="hype-range" min="1" max="100" value="50" oninput="actualizarHypeText(this.value)" />
       </div>
 
-      <!-- Cápsula del tiempo -->
-      <div>
-        <label style="font-size: 13px; color: var(--text-muted); display: block; margin-bottom: 4px;">
-          ⏳ Cápsula del Tiempo (Fecha límite de cumplimiento - opcional):
-        </label>
-        <input type="date" id="fecha-limite" />
-      </div>
-
-      <button type="submit" class="btn-submit">Publicar en el Muro</button>
+      <button type="submit" class="btn-submit">Soltar Proyección Sad</button>
     </form>
 
     <!-- Pestañas de Vista -->
     <div class="nav-tabs">
       <button class="tab-btn active" id="tab-feed" onclick="cambiarVista('feed')">📜 Muro Completo</button>
-      <button class="tab-btn" id="tab-cine" onclick="cambiarVista('cine')">🎥 Proyector de Cine (Top)</button>
+      <button class="tab-btn" id="tab-cine" onclick="cambiarVista('cine')">🎥 Proyector de Cine (Top Proyecciones)</button>
     </div>
 
     <!-- Lista del Feed -->
@@ -310,7 +312,6 @@
   </div>
 
   <script>
-    // Credenciales configuradas
     const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -318,12 +319,12 @@
     let vistaActual = 'feed';
     let postsData = [];
 
-    // Avatares asignados
-    const AVATAR_1 = "https://i.postimg.cc/Y2xk6G7V/Proyectado1.webp";
-    const AVATAR_2 = "https://i.postimg.cc/y6TBmgK2/Proyectado2.webp";
+    // Avatares asignados para los posts (alternando las otras 2 imágenes)
+    const AVATAR_1 = "https://i.postimg.cc/y6TBmgK2/Proyectado2.webp";
+    const AVATAR_2 = "https://i.postimg.cc/PqZnPNKV/670b134a-0bde-4bde-960d-cfb4aa4eb982.jpg";
 
     function actualizarHypeText(val) {
-      document.getElementById("hype-value").innerText = `${val}% Hype`;
+      document.getElementById("hype-value").innerText = `${val}% Bajón`;
     }
 
     function cambiarVista(vista) {
@@ -340,7 +341,7 @@
         .order("created_at", { ascending: false });
 
       if (error) {
-        document.getElementById("posts-container").innerText = "Error al cargar el muro.";
+        document.getElementById("posts-container").innerText = "Error al cargar las proyecciones.";
         console.error(error);
         return;
       }
@@ -361,20 +362,20 @@
       }
 
       if (lista.length === 0) {
-        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px;">No hay proyecciones aún. Sé el primero en proyectarte.</div>`;
+        container.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 40px;">No hay desahogos todavía. Sé el primero en proyectarte.</div>`;
         return;
       }
 
       container.innerHTML = lista.map((post, idx) => {
         const avatarUrl = (post.id % 2 === 0) ? AVATAR_1 : AVATAR_2;
 
-        let capsulaHtml = "";
-        if (post.fecha_limite) {
-          const hoy = new Date();
-          const target = new Date(post.fecha_limite);
-          const diff = Math.ceil((target - hoy) / (1000 * 60 * 60 * 24));
-          const estado = diff >= 0 ? `Quedan ${diff} días` : `¡Plazo vencido!`;
-          capsulaHtml = `<div class="capsule-pill">⏳ Cápsula: vence ${post.fecha_limite} (${estado})</div>`;
+        let postImgHtml = "";
+        if (post.imagen_url && post.imagen_url.trim() !== "") {
+          postImgHtml = `
+            <div class="post-image-box">
+              <img src="${escapeHtml(post.imagen_url)}" alt="Adjunto" loading="lazy" onerror="this.parentElement.style.display='none'" />
+            </div>
+          `;
         }
 
         return `
@@ -384,10 +385,10 @@
               <div class="user-info">
                 <div class="author-name">${escapeHtml(post.autor)}</div>
                 <div style="font-size: 11px; color: var(--text-muted);">
-                  ${new Date(post.created_at).toLocaleDateString()} • <span class="post-tag">#${escapeHtml(post.categoria || 'General')}</span>
+                  ${new Date(post.created_at).toLocaleDateString()} • <span class="post-tag">#${escapeHtml(post.categoria || 'Desahogo')}</span>
                 </div>
               </div>
-              ${vistaActual === 'cine' && idx === 0 ? '<span style="font-size: 20px;" title="Rey del Cine">👑</span>' : ''}
+              ${vistaActual === 'cine' && idx === 0 ? '<span style="font-size: 20px;" title="Proyección Suprema">👑</span>' : ''}
             </div>
 
             <div class="card-hype-bar">
@@ -396,17 +397,17 @@
 
             <div class="post-body">${escapeHtml(post.contenido)}</div>
 
-            ${capsulaHtml}
+            ${postImgHtml}
 
             <div class="post-footer">
               <div class="reactions">
                 <button class="react-btn ${haVotado(post.id, 'chad') ? 'reacted' : ''}" 
                   onclick="votar(${post.id}, 'chad')">
-                  🗿 <span>${post.chad_count || 0}</span>
+                  💔 <span>${post.chad_count || 0}</span>
                 </button>
                 <button class="react-btn ${haVotado(post.id, 'fuego') ? 'reacted' : ''}" 
                   onclick="votar(${post.id}, 'fuego')">
-                  🔥 <span>${post.fuego_count || 0}</span>
+                  🚬 <span>${post.fuego_count || 0}</span>
                 </button>
                 <button class="react-btn ${haVotado(post.id, 'skull') ? 'reacted' : ''}" 
                   onclick="votar(${post.id}, 'skull')">
@@ -437,7 +438,7 @@
 
     window.descargarTarjeta = function(id) {
       const card = document.getElementById(`card-${id}`);
-      html2canvas(card, { backgroundColor: "#151b23", scale: 2 }).then(canvas => {
+      html2canvas(card, { backgroundColor: "#12161f", scale: 2, useCORS: true }).then(canvas => {
         const link = document.createElement("a");
         link.download = `proyectada-${id}.png`;
         link.href = canvas.toDataURL("image/png");
@@ -453,19 +454,19 @@
       const contenido = document.getElementById("contenido").value.trim();
       const categoria = document.getElementById("categoria").value;
       const hype_level = parseInt(document.getElementById("hype-range").value);
-      const fecha_limite = document.getElementById("fecha-limite").value || null;
+      const imagen_url = document.getElementById("imagen-url").value.trim() || null;
 
       const { error } = await supabase.from("proyectadas").insert([{
         autor,
         contenido,
         categoria,
         hype_level,
-        fecha_limite
+        imagen_url
       }]);
 
       if (!error) {
         document.getElementById("contenido").value = "";
-        document.getElementById("fecha-limite").value = "";
+        document.getElementById("imagen-url").value = "";
         cargarPosts();
       } else {
         alert("Fallo al postear: " + error.message);
