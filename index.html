@@ -85,11 +85,18 @@
     .tab-btn { background: transparent; border: none; color: var(--text-muted); font-size: 14px; font-weight: bold; cursor: pointer; padding: 8px 12px; border-radius: 6px; white-space: nowrap;}
     .tab-btn.active { color: #fff; background: var(--card-bg); border: 1px solid var(--border); }
 
+    /* Rango de Owner */
+    .owner-badge {
+      display: inline-flex; align-items: center; gap: 4px; background: rgba(241, 224, 90, 0.1);
+      border: 1px solid #d29922; color: #f1e05a; font-size: 11px; padding: 2px 6px;
+      border-radius: 12px; margin-left: 6px; font-weight: bold; vertical-align: middle;
+    }
+
     /* Tarjetas de Post */
     .post-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
     .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
     .avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #30363d; object-fit: cover; cursor: pointer;}
-    .author-name { font-weight: bold; color: var(--accent); cursor: pointer; }
+    .author-name { font-weight: bold; color: var(--accent); cursor: pointer; display: flex; align-items: center; flex-wrap: wrap;}
     .author-name:hover { text-decoration: underline; }
     .post-body { font-size: 15px; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
     .post-image-box img { width: 100%; max-height: 380px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;}
@@ -102,7 +109,7 @@
     /* ================= SECCIÓN MI PERFIL ================= */
     #mi-perfil-container { display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
     .profile-avatar-large { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px; }
-    .profile-username { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 20px; }
+    .profile-username { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;}
     
     /* ================= MODAL PERFIL USUARIOS ================= */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
@@ -121,7 +128,7 @@
     <!-- Caja de errores -->
     <div id="auth-error"></div>
 
-    <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Goma)" autocomplete="off" />
+    <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Alex_Goma)" autocomplete="off" />
     <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña :3" />
     
     <button class="auth-btn" id="auth-main-btn" onclick="iniciarSesion()">Entrar</button>
@@ -149,8 +156,8 @@
     <!-- Contenedor Principal (Feed + Formulario) -->
     <div id="main-content">
       <form id="proyectada-form">
-        <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px;">
-          Posteando como: <b id="display-alias">@Cargando...</b>
+        <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center;">
+          Posteando como: <b id="display-alias" style="margin-left: 5px;">@Cargando...</b>
         </div>
         <select id="categoria">
           <option value="LaExtraño">💔 #LaExtraño</option>
@@ -209,11 +216,26 @@
     const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    let usuarioActual = null;
-    let usernameActual = "";
-    let modoRegistro = false;
+    // Usando var para evitar errores de inicialización en navegadores estrictos
+    var usuarioActual = null;
+    var usernameActual = "";
+    var modoRegistro = false;
+    var vistaActual = 'feed';
+    var postsData = [];
+    var imagenBase64 = null;
 
-    // --- AUTENTICACIÓN CORREGIDA ---
+    const OWNER_USERNAME = "Alex_Goma";
+
+    function escapeHtml(str) { return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+    function generarEtiquetaOwner(username) {
+      if(username === OWNER_USERNAME) {
+        return `<span class="owner-badge">👑 Owner</span>`;
+      }
+      return "";
+    }
+
+    // --- AUTENTICACIÓN ---
     async function verificarSesion() {
       const { data: { session } } = await db.auth.getSession();
       if (session) {
@@ -221,8 +243,12 @@
         usernameActual = usuarioActual.user_metadata.username;
         document.getElementById('auth-screen').style.display = 'none';
         document.getElementById('app-screen').style.display = 'block';
-        document.getElementById('display-alias').innerText = "@" + usernameActual;
-        document.getElementById('mi-username').innerText = "@" + usernameActual;
+        
+        // Poner etiqueta Owner si aplica
+        const ownerTag = generarEtiquetaOwner(usernameActual);
+        document.getElementById('display-alias').innerHTML = "@" + escapeHtml(usernameActual) + ownerTag;
+        document.getElementById('mi-username').innerHTML = "@" + escapeHtml(usernameActual) + ownerTag;
+        
         cargarPosts();
         cargarMiPerfil();
       } else {
@@ -231,13 +257,13 @@
       }
     }
 
-    function toggleAuthMode() {
+    window.toggleAuthMode = function() {
       modoRegistro = !modoRegistro;
       document.getElementById('auth-title').innerText = modoRegistro ? "Crear Perfil Nuevo 👤" : "Entrar al Muro 🗿";
       document.getElementById('auth-main-btn').innerText = modoRegistro ? "Registrarme" : "Entrar";
       document.getElementById('auth-toggle-btn').innerText = modoRegistro ? "¿Ya tienes perfil? Inicia sesión" : "¿No tienes perfil? Regístrate aquí";
-      document.getElementById('auth-error').style.display = 'none'; // Limpiamos errores al cambiar
-    }
+      document.getElementById('auth-error').style.display = 'none';
+    };
 
     function mostrarErrorAuth(mensaje) {
       const errDiv = document.getElementById('auth-error');
@@ -245,7 +271,7 @@
       errDiv.style.display = 'block';
     }
 
-    async function iniciarSesion() {
+    window.iniciarSesion = async function() {
       const usernameInput = document.getElementById('auth-username').value.trim();
       const password = document.getElementById('auth-pass').value;
       const btn = document.getElementById('auth-main-btn');
@@ -256,7 +282,6 @@
         return mostrarErrorAuth("Llena ambos campos, por favor.");
       }
 
-      // Supabase exige que las contraseñas tengan al menos 6 caracteres
       if (password.length < 6) {
         return mostrarErrorAuth("La contraseña debe tener al menos 6 caracteres.");
       }
@@ -280,7 +305,6 @@
           }
           
           if (data.user) {
-            // Creamos su perfil público en la base de datos
             await db.from('perfiles').insert([{ id: data.user.id, username: usernameInput }]);
             alert("¡Perfil creado con éxito!");
             await verificarSesion();
@@ -296,16 +320,15 @@
         btn.innerText = modoRegistro ? "Registrarme" : "Entrar";
         btn.disabled = false;
       }
-    }
+    };
 
-    async function cerrarSesion() {
+    window.cerrarSesion = async function() {
       await db.auth.signOut();
       usuarioActual = null;
       verificarSesion();
-    }
+    };
 
     // --- NAVEGACIÓN ---
-    let vistaActual = 'feed';
     window.cambiarVista = function(vista) {
       vistaActual = vista;
       document.getElementById('tab-feed').classList.toggle('active', vista === 'feed');
@@ -335,11 +358,12 @@
       const { error } = await db.from('perfiles').update({ biografia: bio }).eq('id', usuarioActual.id);
       if(error) alert("Error al guardar: " + error.message);
       else alert("¡Biografía actualizada!");
-    }
+    };
 
     // --- VER PERFIL DE OTROS (MODAL) ---
     window.abrirPerfil = async function(usernameClick) {
-      document.getElementById('modal-username').innerText = "@" + usernameClick;
+      const ownerTag = generarEtiquetaOwner(usernameClick);
+      document.getElementById('modal-username').innerHTML = "@" + escapeHtml(usernameClick) + ownerTag;
       document.getElementById('modal-bio').innerText = "Cargando...";
       document.getElementById('user-modal').style.display = 'flex';
 
@@ -350,20 +374,17 @@
       } else {
         document.getElementById('modal-bio').innerText = "Perfil no encontrado.";
       }
-    }
+    };
 
     window.cerrarModal = function() {
       document.getElementById('user-modal').style.display = 'none';
-    }
+    };
 
     document.getElementById('user-modal').addEventListener('click', function(e) {
       if(e.target === this) cerrarModal();
     });
 
     // --- SISTEMA DE POSTS ---
-    let postsData = [];
-    let imagenBase64 = null;
-
     document.getElementById("input-file").addEventListener("change", function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -396,7 +417,7 @@
     }
 
     function renderPosts() {
-      if(vistaActual === 'perfil') return; // No renderizar si estoy en mi perfil
+      if(vistaActual === 'perfil') return; 
       const container = document.getElementById("posts-container");
       let lista = [...postsData];
       if (vistaActual === 'cine') {
@@ -406,12 +427,14 @@
 
       container.innerHTML = lista.map((post) => {
         let imgHtml = post.imagen_url ? `<div class="post-image-box"><img src="${post.imagen_url}"/></div>` : "";
+        let ownerTag = generarEtiquetaOwner(post.autor);
+        
         return `
           <div class="post-card" id="card-${post.id}">
             <div class="post-header">
               <img class="avatar" src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" onclick="abrirPerfil('${escapeHtml(post.autor)}')" />
               <div>
-                <div class="author-name" onclick="abrirPerfil('${escapeHtml(post.autor)}')">@${escapeHtml(post.autor)}</div>
+                <div class="author-name" onclick="abrirPerfil('${escapeHtml(post.autor)}')">@${escapeHtml(post.autor)} ${ownerTag}</div>
                 <div style="font-size: 11px; color: var(--text-muted);">
                   ${new Date(post.created_at).toLocaleDateString()} • #${escapeHtml(post.categoria)}
                 </div>
@@ -466,8 +489,6 @@
       cargarPosts();
       btn.disabled = false; btn.innerText = "Soltar Proyección";
     });
-
-    function escapeHtml(str) { return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
     try { db.channel("muro-realtime").on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, cargarPosts).subscribe(); } catch(e){}
 
