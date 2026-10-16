@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>El Muro de las Proyectadas</title>
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.3/supabase.min.js"></script>
+  <!-- AQUÍ ESTÁ LA SOLUCIÓN: Nuevo CDN para evitar bloqueos en Venezuela -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <style>
@@ -114,7 +115,6 @@
   <div id="auth-screen" class="container">
     <h2 id="auth-title">Entrar al Muro 🗿</h2>
     
-    <!-- Caja de errores que no desaparecerá hasta que lo arregles -->
     <div id="auth-error"></div>
 
     <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Alex_Goma)" autocomplete="off" />
@@ -200,7 +200,6 @@
 
   <!-- SCRIPTS Y LÓGICA -->
   <script>
-    // 1. Declarar TODAS las variables globales al principio para que los botones NUNCA choquen
     var modoRegistro = false;
     var usuarioActual = null;
     var usernameActual = "";
@@ -209,10 +208,8 @@
     var imagenBase64 = null;
     var db = null;
     
-    // TÚ ERES EL DUEÑO 👑
     var OWNER_USERNAME = "Alex_Goma";
 
-    // 2. Funciones de UI básicas (Tienen que funcionar sin importar si la base de datos se cae)
     function escapeHtml(str) { return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
 
     function generarEtiquetaOwner(username) {
@@ -236,7 +233,6 @@
       document.getElementById('auth-error').style.display = 'none';
     };
 
-    // 3. Inicializar Base de datos de forma segura
     if (typeof window.supabase === 'undefined') {
       mostrarErrorAuth("Tu internet o navegador está bloqueando la base de datos.<br/><b>Solución:</b> Usa un VPN (como ProtonVPN o 1.1.1.1) y recarga la página.");
     } else {
@@ -245,7 +241,6 @@
       db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
-    // 4. Lógica de Autenticación
     async function verificarSesion() {
       if (!db) return;
       const { data: { session } } = await db.auth.getSession();
@@ -298,7 +293,7 @@
           });
           
           if (error) {
-            if(error.message.includes("already registered")) throw new Error("Ese nombre de usuario ya está registrado. Intenta iniciar sesión.");
+            if(error.message.includes("already registered") || error.message.includes("User already registered")) throw new Error("Ese nombre de usuario ya está registrado. Intenta iniciar sesión.");
             throw error;
           }
           
@@ -326,7 +321,6 @@
       verificarSesion();
     };
 
-    // 5. Navegación, Perfiles y Feed
     window.cambiarVista = function(vista) {
       vistaActual = vista;
       document.getElementById('tab-feed').classList.toggle('active', vista === 'feed');
