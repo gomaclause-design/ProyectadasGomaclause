@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>El Muro de las Proyectadas</title>
+  
   <!-- SDK Supabase y html2canvas -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -22,7 +23,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, sans-serif;
-      padding: 20px 14px 90px 14px; /* Espacio abajo para que el botón flotante no tape contenido */
+      padding: 20px 14px 90px 14px; 
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -97,7 +98,7 @@
       cursor: pointer;
     }
 
-    /* Input personalizado para fotos de la galería */
+    /* Galería */
     .file-upload-box {
       border: 1px dashed var(--border);
       padding: 12px;
@@ -423,12 +424,12 @@
       <button class="tab-btn" id="tab-cine" onclick="cambiarVista('cine')">🎥 Proyector de Cine (Top Proyecciones)</button>
     </div>
 
-    <!-- Lista del Feed -->
+    <!-- Lista del Feed / Contenedor de Errores -->
     <div id="posts-container">Cargando proyecciones...</div>
 
   </div>
 
-  <!-- Botón Flotante de WhatsApp en la esquina inferior derecha -->
+  <!-- Botón Flotante de WhatsApp -->
   <a href="https://chat.whatsapp.com/Im4wBFiyQwdFxHy7dIWoIR" target="_blank" rel="noopener noreferrer" class="whatsapp-float">
     <div class="wa-icon-circle">
       <svg viewBox="0 0 24 24">
@@ -439,6 +440,26 @@
   </a>
 
   <script>
+    // --- DETECTOR AUTOMÁTICO DE ERRORES ---
+    window.onerror = function(msg, url, lineNo, columnNo, error) {
+      const container = document.getElementById("posts-container");
+      if(container) {
+        container.innerHTML = `
+          <div style="background: #3a1515; border: 1px solid #f85149; padding: 16px; border-radius: 8px; color: #ff7b72; margin-top: 10px;">
+            <h3 style="margin-top:0;">⚠️ Script Detenido por un Error:</h3>
+            <p><strong>Motivo:</strong> ${msg}</p>
+            <p style="font-size: 13px; color: #8b949e;">Si dice "supabase is not defined", significa que tu internet bloqueó el CDN de Supabase (Pasa mucho con CANTV). Intenta activando un VPN (como 1.1.1.1 o ProtonVPN).</p>
+          </div>
+        `;
+      }
+      return false;
+    };
+
+    // Asegurar que supabase cargó antes de seguir
+    if (typeof window.supabase === 'undefined') {
+      throw new Error("La librería de Supabase no cargó (CDN bloqueado).");
+    }
+
     const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -461,7 +482,17 @@
       renderPosts();
     }
 
-    // Comprimir y procesar la foto de galería
+    document.getElementById("anonimo-check").addEventListener("change", function(e) {
+      const autorInput = document.getElementById("autor");
+      if (e.target.checked) {
+        autorInput.removeAttribute("required");
+        autorInput.disabled = true;
+      } else {
+        autorInput.setAttribute("required", "true");
+        autorInput.disabled = false;
+      }
+    });
+
     document.getElementById("input-file").addEventListener("change", function(e) {
       const file = e.target.files[0];
       if (!file) return;
@@ -505,18 +536,28 @@
     };
 
     async function cargarPosts() {
-      const { data, error } = await supabase
-        .from("proyectadas")
-        .select("*")
-        .order("created_at", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("proyectadas")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-      if (error) {
-        document.getElementById("posts-container").innerText = "Error al cargar las proyecciones.";
-        console.error(error);
-        return;
+        if (error) {
+          throw error;
+        }
+        
+        postsData = data;
+        renderPosts();
+      } catch (err) {
+        // Muestra el error de la base de datos visualmente
+        document.getElementById("posts-container").innerHTML = `
+          <div style="background: #3a1515; border: 1px solid #f85149; padding: 16px; border-radius: 8px; color: #ff7b72;">
+            <h3 style="margin-top:0;">❌ Error conectando a la Base de Datos:</h3>
+            <p>${err.message || JSON.stringify(err)}</p>
+            <p style="font-size: 13px; color: #8b949e;">Si dice "relation proyectadas does not exist", significa que no creaste la tabla en Supabase.</p>
+          </div>
+        `;
       }
-      postsData = data;
-      renderPosts();
     }
 
     function renderPosts() {
@@ -624,42 +665,55 @@
 
       const isAnon = document.getElementById("anonimo-check").checked;
       const autorInput = document.getElementById("autor").value.trim();
-      const autor = isAnon ? "@ProyectadoAnonimo" : autorInput;
+      
+      const autor = isAnon ? "@ProyectadoAnonimo" : (autorInput || "@ProyectadoAnonimo");
       const contenido = document.getElementById("contenido").value.trim();
       const categoria = document.getElementById("categoria").value;
       const hype_level = parseInt(document.getElementById("hype-range").value);
 
-      const { error } = await supabase.from("proyectadas").insert([{
-        autor,
-        contenido,
-        categoria,
-        hype_level,
-        imagen_url: imagenBase64
-      }]);
+      try {
+        const { error } = await supabase.from("proyectadas").insert([{
+          autor,
+          contenido,
+          categoria,
+          hype_level,
+          imagen_url: imagenBase64
+        }]);
 
-      btn.disabled = false;
-      btn.innerText = "Soltar Proyección Sad";
+        if (error) throw error;
 
-      if (!error) {
         document.getElementById("contenido").value = "";
         quitarImagen();
         cargarPosts();
-      } else {
-        alert("Fallo al postear: " + error.message);
+      } catch (err) {
+        document.getElementById("posts-container").innerHTML = `
+          <div style="background: #3a1515; border: 1px solid #f85149; padding: 16px; border-radius: 8px; color: #ff7b72; margin-top:10px;">
+            <h3 style="margin-top:0;">❌ Error al Postear:</h3>
+            <p>${err.message || JSON.stringify(err)}</p>
+          </div>
+        `;
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Soltar Proyección Sad";
       }
     });
 
-    supabase
-      .channel("muro-realtime")
-      .on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, () => {
-        cargarPosts();
-      })
-      .subscribe();
+    try {
+      supabase
+        .channel("muro-realtime")
+        .on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, () => {
+          cargarPosts();
+        })
+        .subscribe();
+    } catch (e) {
+      console.error("No se pudo iniciar el tiempo real (WebSockets bloqueados):", e);
+    }
 
     function escapeHtml(str) {
       return (str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     }
 
+    // Iniciar
     cargarPosts();
   </script>
 </body>
