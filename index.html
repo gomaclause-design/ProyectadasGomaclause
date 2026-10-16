@@ -310,9 +310,9 @@
   </div>
 
   <script>
-    // ⚠️ REEMPLAZA ESTO CON TUS CLAVES DE SUPABASE
-    const SUPABASE_URL = "https://TU_PROYECTO.supabase.co";
-    const SUPABASE_ANON_KEY = "TU_PUBLIC_ANON_KEY";
+    // Credenciales configuradas
+    const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let vistaActual = 'feed';
@@ -341,6 +341,7 @@
 
       if (error) {
         document.getElementById("posts-container").innerText = "Error al cargar el muro.";
+        console.error(error);
         return;
       }
       postsData = data;
@@ -352,7 +353,6 @@
       let lista = [...postsData];
 
       if (vistaActual === 'cine') {
-        // En el Proyector de Cine ordenamos por la suma total de reacciones
         lista.sort((a, b) => {
           const scoreA = (a.chad_count || 0) + (a.fuego_count || 0) + (a.skull_count || 0);
           const scoreB = (b.chad_count || 0) + (b.fuego_count || 0) + (b.skull_count || 0);
@@ -366,11 +366,8 @@
       }
 
       container.innerHTML = lista.map((post, idx) => {
-        // Alternar avatar según el ID para variedad visual
         const avatarUrl = (post.id % 2 === 0) ? AVATAR_1 : AVATAR_2;
-        const totalVotos = (post.chad_count || 0) + (post.fuego_count || 0) + (post.skull_count || 0);
 
-        // Cápsula del tiempo check
         let capsulaHtml = "";
         if (post.fecha_limite) {
           const hoy = new Date();
@@ -426,7 +423,6 @@
       }).join("");
     }
 
-    // Manejo de Reacciones
     function haVotado(id, tipo) {
       return localStorage.getItem(`reacc_${id}_${tipo}`) === "true";
     }
@@ -439,7 +435,6 @@
       cargarPosts();
     };
 
-    // Generar captura en imagen para WhatsApp/Discord
     window.descargarTarjeta = function(id) {
       const card = document.getElementById(`card-${id}`);
       html2canvas(card, { backgroundColor: "#151b23", scale: 2 }).then(canvas => {
@@ -450,7 +445,6 @@
       });
     };
 
-    // Publicar
     document.getElementById("proyectada-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       const isAnon = document.getElementById("anonimo-check").checked;
@@ -478,7 +472,6 @@
       }
     });
 
-    // Escucha en tiempo real
     supabase
       .channel("muro-realtime")
       .on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, () => {
