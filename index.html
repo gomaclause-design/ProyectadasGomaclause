@@ -437,7 +437,7 @@
   </div>
 
   <!-- ================= PANDACHAN IA CHAT (VÍA PUENTE LOCAL) ================= -->
-  <div class="pandachan-trigger" onclick="toggleChat()">
+  <div class="pandachan-trigger" id="pandachan-trigger">
     <div class="pandachan-indicator"></div>
   </div>
 
@@ -490,6 +490,91 @@
       document.getElementById('pandachan-panel').classList.toggle('open');
     }
 
+    // --- Lógica para arrastrar el botón de PandaChan (Mejorada para PC y Celulares) ---
+    const trigger = document.getElementById('pandachan-trigger');
+    let isDragging = false;
+    let hasDragged = false;
+    let startX, startY, initialLeft, initialTop;
+
+    const dragStart = (e) => {
+      isDragging = true;
+      hasDragged = false;
+      
+      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+      
+      startX = clientX;
+      startY = clientY;
+      
+      const rect = trigger.getBoundingClientRect();
+      initialLeft = rect.left;
+      initialTop = rect.top;
+      
+      trigger.style.transition = 'none'; // Quitar transición al arrastrar para que sea fluido
+    };
+
+    const dragMove = (e) => {
+      if (!isDragging) return;
+      
+      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+      
+      const dx = clientX - startX;
+      const dy = clientY - startY;
+      
+      // Si se mueve más de 5 píxeles, se considera un "arrastre" y no un "clic"
+      if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+          hasDragged = true;
+      }
+      
+      if (hasDragged) {
+          e.preventDefault(); // Evita que la pantalla haga scroll en celulares mientras arrastras
+          
+          let newLeft = initialLeft + dx;
+          let newTop = initialTop + dy;
+          
+          // Mantener la burbuja dentro de los límites de la pantalla
+          const maxX = window.innerWidth - trigger.offsetWidth;
+          const maxY = window.innerHeight - trigger.offsetHeight;
+          
+          newLeft = Math.max(0, Math.min(newLeft, maxX));
+          newTop = Math.max(0, Math.min(newTop, maxY));
+          
+          trigger.style.left = `${newLeft}px`;
+          trigger.style.top = `${newTop}px`;
+          trigger.style.right = 'auto'; 
+          trigger.style.bottom = 'auto';
+      }
+    };
+
+    const dragEnd = () => {
+      if (isDragging) {
+        isDragging = false;
+        trigger.style.transition = 'transform 0.2s';
+      }
+    };
+
+    // Eventos para PC (Mouse)
+    trigger.addEventListener('mousedown', dragStart);
+    document.addEventListener('mousemove', dragMove, { passive: false });
+    document.addEventListener('mouseup', dragEnd);
+
+    // Eventos para Celulares (Táctil)
+    trigger.addEventListener('touchstart', dragStart, { passive: true });
+    document.addEventListener('touchmove', dragMove, { passive: false });
+    document.addEventListener('touchend', dragEnd);
+
+    // Abrir chat solo si se hizo clic y NO se arrastró
+    trigger.addEventListener('click', (e) => {
+      if (hasDragged) {
+        e.preventDefault();
+        e.stopPropagation();
+      } else {
+        toggleChat();
+      }
+    });
+    // ----------------------------------------------------------------------------------
+
     async function enviarMensajeIA() {
       const input = document.getElementById('chat-input');
       const text = input.value.trim();
@@ -528,7 +613,7 @@
       } catch (error) {
         typing.style.display = 'none';
         console.error("Error conectando con la laptop:", error);
-        agregarBurbuja("bot", "Ups... no me puedo comunicar con mi servidor en la laptop 🐼💦 Asegúrate de que localtunnel esté activo.");
+        agregarBurbuja("bot", "Ups... no me puedo comunicar con mi servidor en la laptop 🐼💦 Asegúrate de que Cloudflare esté activo.");
       }
     }
 
