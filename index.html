@@ -176,9 +176,9 @@
       width: 60px;
       height: 60px;
       border-radius: 50%;
-      background-image: url('https://i.postimg.cc/65n8sdt0/33cb86c1-29c6-4998-892e-9cb5bd6f2b34.jpg');
+      background-image: url('https://i.postimg.cc/65n8sdt0/33cb86c1-29c6-4998-892e-9cb5bd6f2b34.jpg'); /* Avatar de PandaChan */
       background-size: cover;
-      background-position: center top;
+      background-position: center top; /* Centrado perfecto en la cara */
       border: 3px solid #6dd5ed; 
       box-shadow: 0 0 15px rgba(109, 213, 237, 0.5);
       cursor: pointer;
@@ -478,7 +478,7 @@
     // CONFIGURACIÓN DE OPENROUTER (PANDACHAN)
     // ==========================================
     const OPENROUTER_API_KEY = "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";
-    const OPENROUTER_MODEL = "google/gemini-2.5-flash-free"; // O puedes usar "openai/gpt-4o" si lo prefieres
+    const OPENROUTER_MODEL = "openai/gpt-4o"; // Actualizado a gpt-4o como pediste
 
     let historialChat = [
       {
@@ -510,8 +510,8 @@
           method: "POST",
           headers: {
             "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-            "HTTP-Referer": window.location.href, // OpenRouter lo requiere
-            "X-Title": "El Muro de las Proyectadas", // OpenRouter lo requiere
+            "HTTP-Referer": window.location.href,
+            "X-Title": "El Muro de las Proyectadas",
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
@@ -549,7 +549,7 @@
         `;
       } else {
         divContenedor.className = "msg-bot-container";
-        const parsedText = marked.parse(text); // Convierte Markdown a HTML
+        const parsedText = marked.parse(text);
         divContenedor.innerHTML = `
           <div class="msg-avatar avatar-bot"></div>
           <div class="msg-bubble msg-bot">${parsedText}</div>
