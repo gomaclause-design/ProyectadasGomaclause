@@ -607,18 +607,38 @@
       }]);
       
       // ==========================================
-      // WEBHOOK DE DISCORD AUTOMÁTICA
+      // WEBHOOK DE DISCORD AUTOMÁTICA CON IMAGEN
       // ==========================================
-      const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1564820172294848632/pgSEqPtKxMuiR0nXN6I-jpqOtQZXORj6woqi1yuYJskLI9UuIWkoIbl0qTlmypjiGK2H"; // <-- ¡PEGA AQUÍ EL LINK DE TU WEBHOOK DE DISCORD!
+      const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1564820172294848632/pgSEqPtKxMuiR0nXN6I-jpqOtQZXORj6woqi1yuYJskLI9UuIWkoIbl0qTlmypjiGK2H";
       
       if (DISCORD_WEBHOOK_URL) {
-        fetch(DISCORD_WEBHOOK_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            content: `🌧️ **Nueva Proyectada en el Muro** 🚬\n**Autor:** @${usernameActual}\n**Categoría:** #${categoria}\n**Nivel de Bajón:** ${hype_level}%\n\n> ${contenido}`
-          })
-        }).catch(err => console.error("Error al enviar webhook de Discord:", err));
+        const mensajeTexto = `🌧️ **Nueva Proyectada en el Muro** 🚬\n**Autor:** @${usernameActual}\n**Categoría:** #${categoria}\n**Nivel de Bajón:** ${hype_level}%\n\n> ${contenido}`;
+        
+        if (imagenBase64) {
+          // Convertimos la imagen de Base64 a un archivo real para que Discord la reciba adjunta
+          fetch(imagenBase64)
+            .then(res => res.blob())
+            .then(blob => {
+              const formData = new FormData();
+              // Añadimos el texto
+              formData.append("payload_json", JSON.stringify({ content: mensajeTexto }));
+              // Adjuntamos la imagen
+              formData.append("file", blob, "proyectada.jpg");
+              
+              return fetch(DISCORD_WEBHOOK_URL, {
+                method: "POST",
+                body: formData
+              });
+            })
+            .catch(err => console.error("Error al enviar webhook con imagen:", err));
+        } else {
+          // Si no hay imagen subida, se envía solo texto normal
+          fetch(DISCORD_WEBHOOK_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ content: mensajeTexto })
+          }).catch(err => console.error("Error al enviar webhook de texto:", err));
+        }
       }
       // ==========================================
 
