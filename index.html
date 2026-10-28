@@ -5,25 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>El Muro de las Proyectadas</title>
   
+  <!-- Supabase y Herramientas -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <!-- API de YouTube para el reproductor -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <!-- Iconos FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <style>
+    /* ================= TEMA DEPRESIVO / MELANCÓLICO ================= */
     :root {
-      --bg: #090c10;
-      --card-bg: #12161f;
-      --border: #252d3a;
-      --accent: #79a8d8;
-      --text: #c9d1d9;
-      --text-muted: #6e7681;
+      --bg: #030304;          /* Negro casi total */
+      --card-bg: #0a0a0c;     /* Gris súper oscuro */
+      --border: #18181c;      /* Bordes sutiles */
+      --accent: #5e6275;      /* Gris azulado apagado */
+      --text: #a1a3ab;        /* Texto desaturado */
+      --text-muted: #4e505c;  /* Texto secundario muy oscuro */
     }
+    
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    
     body {
-      background: var(--bg); color: var(--text);
+      background: var(--bg); 
+      background-image: radial-gradient(circle at 50% 0%, #111116 0%, #030304 100%);
+      color: var(--text);
       font-family: system-ui, -apple-system, sans-serif;
-      padding: 20px 14px 90px 14px; display: flex; flex-direction: column;
+      padding: 20px 14px 120px 14px; /* Espacio extra abajo para el reproductor */
+      display: flex; flex-direction: column;
       align-items: center; min-height: 100vh;
     }
+    
     .container { width: 100%; max-width: 650px; }
 
     /* ================= LOGIN ================= */
@@ -31,191 +43,220 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       margin-top: 10vh; width: 100%; max-width: 350px; background: var(--card-bg);
       padding: 30px 20px; border-radius: 12px; border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8);
     }
-    #auth-screen h2 { margin-bottom: 20px; color: #e6edf3; text-align: center; }
+    #auth-screen h2 { margin-bottom: 20px; color: #d0d2d6; text-align: center; font-weight: normal; }
     .auth-input {
-      background: #090c10; border: 1px solid var(--border); color: var(--text); 
+      background: #050506; border: 1px solid var(--border); color: var(--text); 
       padding: 12px; border-radius: 6px; width: 100%; margin-bottom: 12px; font-size: 15px;
     }
     .auth-btn {
-      width: 100%; background: #1f364d; color: #fff; font-weight: bold; border: 1px solid #388bfd44; 
+      width: 100%; background: #1a1a24; color: #aaa; border: 1px solid var(--border); 
       padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; margin-bottom: 10px;
     }
-    .auth-btn:hover:not(:disabled) { background: #264766; }
-    .auth-btn:disabled { opacity: 0.7; cursor: not-allowed; }
-    .auth-switch { color: var(--accent); font-size: 13px; cursor: pointer; text-align: center; }
-    .auth-switch:hover { text-decoration: underline; }
-    #auth-error { color: #f85149; font-size: 13px; margin-bottom: 12px; text-align: center; display: none; background: #3a1515; padding: 10px; border-radius: 6px; width: 100%; border: 1px solid #f85149;}
+    .auth-btn:hover:not(:disabled) { background: #232330; color: #ddd; }
+    .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .auth-switch { color: var(--accent); font-size: 13px; cursor: pointer; text-align: center; opacity: 0.7;}
+    .auth-switch:hover { text-decoration: underline; opacity: 1;}
+    #auth-error { color: #8a3a3a; font-size: 13px; margin-bottom: 12px; text-align: center; display: none; background: #1c0b0b; padding: 10px; border-radius: 6px; width: 100%; border: 1px solid #4a1919;}
 
     /* ================= MURO PRINCIPAL ================= */
     #app-screen { display: none; width: 100%; }
     .hero-banner { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 24px; text-align: center; position: relative; }
-    .hero-banner img { width: 100%; height: 200px; object-fit: cover; display: block; filter: brightness(0.85); }
+    .hero-banner img { width: 100%; height: 200px; object-fit: cover; display: block; filter: grayscale(80%) brightness(0.5); }
     .hero-title { padding: 16px; }
-    .hero-title h1 { font-size: 23px; color: #e6edf3; display: flex; justify-content: center; gap: 10px; }
+    .hero-title h1 { font-size: 21px; color: #c0c0c0; display: flex; justify-content: center; gap: 10px; font-weight: normal; letter-spacing: 1px;}
     .hero-title p { font-size: 13px; color: var(--text-muted); margin-top: 6px; font-style: italic; }
-    .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); border: 1px solid var(--border); color: #fff; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .logout-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.8); border: 1px solid var(--border); color: #888; padding: 5px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; transition: 0.2s;}
+    .logout-btn:hover { color: #fff; background: #111;}
 
-    form { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
-    textarea, select { background: #090c10; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; width: 100%; font-family: inherit;}
-    .file-upload-box { border: 1px dashed var(--border); padding: 12px; border-radius: 8px; background: #090c10; }
-    .custom-file-btn { background: #182230; border: 1px solid var(--border); color: var(--accent); padding: 8px 14px; border-radius: 6px; cursor: pointer; display: inline-block; font-size: 13px;}
+    form { background: var(--card-bg); border: 1px solid var(--border); padding: 18px; border-radius: 12px; display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); }
+    textarea, select { background: #050506; border: 1px solid var(--border); color: var(--text); padding: 10px 12px; border-radius: 6px; width: 100%; font-family: inherit;}
+    .file-upload-box { border: 1px dashed var(--border); padding: 12px; border-radius: 8px; background: #050506; text-align: center;}
+    .custom-file-btn { background: #111116; border: 1px solid var(--border); color: var(--accent); padding: 8px 14px; border-radius: 6px; cursor: pointer; display: inline-block; font-size: 13px;}
     #input-file { display: none; }
     .preview-box { display: none; position: relative; margin-top: 10px; }
-    .preview-box img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px; }
-    .hype-container { background: #090c10; border: 1px solid var(--border); padding: 10px 14px; border-radius: 6px; }
-    input[type="range"] { width: 100%; accent-color: #79a8d8; }
-    .btn-submit { background: #1f364d; color: #fff; font-weight: bold; border: 1px solid #388bfd44; padding: 12px; border-radius: 6px; cursor: pointer; }
+    
+    /* === ARREGLO DE IMÁGENES CORTADAS === */
+    .preview-box img, .post-image-box img { 
+      width: 100%; 
+      max-height: 550px; 
+      object-fit: contain; /* Esto evita que se corte */
+      background: #020202; /* Fondo negro para rellenar espacios */
+      border-radius: 8px; 
+    }
+    
+    .btn-remove-img { position: absolute; top: 5px; right: 5px; background: rgba(0,0,0,0.8); color: white; border: none; width: 25px; height: 25px; border-radius: 50%; cursor: pointer;}
+    
+    .hype-container { background: #050506; border: 1px solid var(--border); padding: 10px 14px; border-radius: 6px; }
+    .hype-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 8px; color: var(--text-muted);}
+    input[type="range"] { width: 100%; accent-color: var(--accent); opacity: 0.6; }
+    .btn-submit { background: #111116; color: #888; border: 1px solid var(--border); padding: 12px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+    .btn-submit:hover { color: #bbb; background: #1a1a24; }
 
     /* Pestañas */
     .nav-tabs { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid var(--border); padding-bottom: 8px; overflow-x: auto;}
-    .tab-btn { background: transparent; border: none; color: var(--text-muted); font-size: 14px; font-weight: bold; cursor: pointer; padding: 8px 12px; border-radius: 6px; white-space: nowrap;}
-    .tab-btn.active { color: #fff; background: var(--card-bg); border: 1px solid var(--border); }
+    .tab-btn { background: transparent; border: none; color: var(--text-muted); font-size: 14px; cursor: pointer; padding: 8px 12px; border-radius: 6px; white-space: nowrap;}
+    .tab-btn.active { color: #aaa; background: var(--card-bg); border: 1px solid var(--border); }
 
     /* Filtros por Categoría */
     .filtros-container { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: thin; }
-    .filtro-btn { background: #090c10; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 16px; cursor: pointer; font-size: 13px; white-space: nowrap; transition: 0.2s; }
-    .filtro-btn:hover { background: #1c2128; color: var(--text); }
-    .filtro-btn.active { background: var(--accent); color: #090c10; font-weight: bold; border-color: var(--accent); }
+    .filtro-btn { background: #050506; border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 16px; cursor: pointer; font-size: 13px; white-space: nowrap; transition: 0.2s; }
+    .filtro-btn:hover { background: #111116; color: #aaa; }
+    .filtro-btn.active { background: #1a1a24; color: #ddd; border-color: var(--accent); }
 
-    /* Rango de Owner */
-    .owner-badge {
-      display: inline-flex; align-items: center; gap: 4px; background: rgba(241, 224, 90, 0.1);
-      border: 1px solid #d29922; color: #f1e05a; font-size: 11px; padding: 2px 6px;
-      border-radius: 12px; margin-left: 6px; font-weight: bold; vertical-align: middle;
-    }
+    .owner-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(94, 98, 117, 0.1); border: 1px solid var(--accent); color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 12px; margin-left: 6px; vertical-align: middle; }
 
     /* Tarjetas de Post */
-    .post-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-    .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-    .avatar { width: 42px; height: 42px; border-radius: 50%; border: 2px solid #30363d; object-fit: cover; cursor: pointer;}
-    .author-name { font-weight: bold; color: var(--accent); cursor: pointer; display: flex; align-items: center; flex-wrap: wrap;}
-    .author-name:hover { text-decoration: underline; }
-    .post-body { font-size: 15px; margin-bottom: 12px; white-space: pre-wrap; line-height: 1.5; }
-    .post-image-box img { width: 100%; max-height: 380px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;}
-    .card-hype-bar { height: 3px; background: #182230; margin-bottom: 12px; }
-    .card-hype-fill { height: 100%; background: linear-gradient(90deg, #388bfd, #8957e5); }
+    .post-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);}
+    .post-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; border: 1px solid var(--border); object-fit: cover; cursor: pointer; filter: grayscale(60%);}
+    .author-name { color: #999; cursor: pointer; display: flex; align-items: center; flex-wrap: wrap; font-size: 14px;}
+    .author-name:hover { color: #ccc; }
+    .post-body { font-size: 14.5px; margin-bottom: 15px; white-space: pre-wrap; line-height: 1.6; color: #bbb;}
+    .post-image-box img { margin-bottom: 15px; }
+    .card-hype-bar { height: 2px; background: #050506; margin-bottom: 15px; }
+    .card-hype-fill { height: 100%; background: linear-gradient(90deg, #2a2a35, var(--accent)); }
     
-    .post-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; flex-wrap: wrap; gap: 10px;}
+    .post-footer { display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 12px; flex-wrap: wrap; gap: 10px;}
     .reactions { display: flex; gap: 6px; align-items: center;}
-    .react-btn, .btn-capture { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 5px 10px; border-radius: 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 4px; }
-    .react-btn:hover, .btn-capture:hover { background: #1c2128; }
-    .react-btn.reacted { border-color: var(--accent); color: var(--accent); }
+    .react-btn, .btn-capture { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px; border-radius: 16px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s;}
+    .react-btn:hover, .btn-capture:hover { background: #111116; color: #888;}
+    .react-btn.reacted { border-color: var(--accent); color: #aaa; }
 
-    /* ================= COMENTARIOS ================= */
-    .comments-section {
-      margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 12px; display: none;
-      animation: fadeIn 0.2s ease-in;
-    }
-    @keyframes fadeIn { from{opacity:0; transform:translateY(-5px);} to{opacity:1; transform:translateY(0);} }
-    .comment-item {
-      background: #090c10; border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px;
-      margin-bottom: 8px; font-size: 13.5px;
-    }
-    .comment-author { font-weight: bold; color: var(--accent); cursor: pointer; }
-    .comment-author:hover { text-decoration: underline; }
+    /* COMENTARIOS */
+    .comments-section { margin-top: 15px; border-top: 1px dashed var(--border); padding-top: 12px; display: none; }
+    .comment-item { background: #050506; border: 1px solid var(--border); padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; color: #999;}
+    .comment-author { color: #777; cursor: pointer; margin-right: 5px;}
     .comment-input-box { display: flex; gap: 8px; margin-top: 12px; }
-    .comment-input-box input { flex: 1; padding: 10px; border-radius: 6px; background: #090c10; border: 1px solid var(--border); color: var(--text); font-size: 13px;}
-    .comment-input-box button { background: #238636; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;}
-    .comment-input-box button:hover { background: #2ea043; }
+    .comment-input-box input { flex: 1; padding: 10px; border-radius: 6px; background: #050506; border: 1px solid var(--border); color: var(--text); font-size: 13px;}
+    .comment-input-box button { background: #111116; color: #888; border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; cursor: pointer; transition: 0.2s;}
 
-    /* ================= SECCIÓN MI PERFIL ================= */
+    /* PERFIL Y MODAL */
     #mi-perfil-container { display: none; background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; text-align: center; }
-    .profile-avatar-large { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--accent); object-fit: cover; margin-bottom: 15px; }
-    .profile-username { font-size: 20px; font-weight: bold; color: #fff; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;}
-    
-    /* ================= MODAL PERFIL USUARIOS ================= */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; }
+    .profile-avatar-large { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--border); object-fit: cover; margin-bottom: 15px; filter: grayscale(50%);}
+    .profile-username { font-size: 18px; color: #bbb; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;}
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(5px);}
     .modal-content { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 24px; width: 90%; max-width: 400px; text-align: center; position: relative; }
     .close-modal { position: absolute; top: 10px; right: 15px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
-    .modal-bio { margin-top: 15px; font-size: 14px; color: var(--text); white-space: pre-wrap; line-height: 1.5; background: #090c10; padding: 12px; border-radius: 8px; border: 1px solid var(--border);}
+    .modal-bio { margin-top: 15px; font-size: 13px; color: #888; white-space: pre-wrap; line-height: 1.5; background: #050506; padding: 12px; border-radius: 8px; border: 1px solid var(--border);}
 
-    /* ================= BOTÓN DE DISCORD ================= */
-    .discord-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      background-color: #5865F2;
-      color: white;
-      text-decoration: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 12px;
-      transition: 0.2s ease;
-      border: 1px solid #4752C4;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    /* BOTÓN DE DISCORD OSCURO */
+    .discord-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background-color: #1b1d2e; color: #767ea3; text-decoration: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; margin-top: 12px; transition: 0.2s ease; border: 1px solid #23263d;}
+    .discord-btn:hover { background-color: #23263d; color: #9aa2cc;}
+    .discord-icon { width: 16px; height: 16px; fill: currentColor; }
+
+    /* ================= REPRODUCTOR MINI FLOTANTE ================= */
+    .mini-player-container {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 95%;
+      max-width: 600px;
+      background: rgba(28, 25, 33, 0.7); /* Tono purpura/gris muy oscuro semitransparente */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 12px 16px 8px 16px;
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+      transition: opacity 0.3s, transform 0.3s;
     }
+    .player-top { display: flex; align-items: center; gap: 12px; }
     
-    .discord-btn:hover {
-      background-color: #4752C4;
-      transform: translateY(-2px);
+    .player-menu-btn {
+      background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.05); color: #aaa;
+      width: 38px; height: 38px; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
     }
+    .player-menu-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff;}
     
-    .discord-icon {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
+    .track-info { flex: 1; overflow: hidden; display: flex; flex-direction: column; justify-content: center;}
+    .track-title { font-size: 14px; font-weight: bold; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;}
+    .track-artist { font-size: 11px; color: #888; margin-top: 2px;}
+
+    .player-controls { display: flex; align-items: center; gap: 4px; }
+    .player-icon-btn {
+      background: rgba(0, 0, 0, 0.2); border: none; color: #bbb;
+      width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;
+    }
+    .player-icon-btn:hover { background: rgba(255, 255, 255, 0.1); color: #fff;}
+    .play-btn { width: 36px; height: 36px; font-size: 14px; background: rgba(255, 255, 255, 0.05);}
+
+    .vol-slider { width: 55px; height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.2); border-radius: 2px; outline: none; margin-left: 2px; cursor: pointer;}
+    .vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; cursor: pointer;}
+    
+    .window-controls { display: flex; gap: 4px; margin-left: 8px; border-left: 1px solid rgba(255,255,255,0.1); padding-left: 8px;}
+    
+    .player-bottom { display: flex; align-items: center; gap: 10px; margin-top: 8px; width: 100%;}
+    .track-slider { flex: 1; height: 4px; -webkit-appearance: none; background: rgba(255,255,255,0.2); border-radius: 2px; outline: none; cursor: pointer;}
+    .track-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 10px; height: 10px; border-radius: 50%; background: #fff; cursor: pointer; box-shadow: 0 0 5px rgba(255,255,255,0.5);}
+    .time-display { font-size: 10px; color: #888; font-weight: bold; width: 65px; text-align: right;}
+    
+    /* Esconder YouTube visualmente */
+    #yt-hidden-player { display: none; }
+    
+    @media (max-width: 550px) {
+        .player-controls .hide-mobile { display: none; }
+        .vol-slider { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- ================= LOGIN / REGISTRO ================= -->
+  <!-- LOGIN -->
   <div id="auth-screen" class="container">
-    <h2 id="auth-title">Entrar al Muro 🗿</h2>
+    <h2 id="auth-title">Entrar al Muro</h2>
     <div id="auth-error"></div>
     <input type="text" id="auth-username" class="auth-input" placeholder="Usuario (ej: Alex_Goma)" autocomplete="off" />
-    <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña :3" />
+    <input type="password" id="auth-pass" class="auth-input" placeholder="Contraseña..." />
     <button class="auth-btn" id="auth-main-btn" onclick="iniciarSesion()">Entrar</button>
-    <div class="auth-switch" id="auth-toggle-btn" onclick="toggleAuthMode()">¿No tienes perfil? Regístrate aquí</div>
+    <div class="auth-switch" id="auth-toggle-btn" onclick="toggleAuthMode()">Registrar un nuevo perfil</div>
   </div>
 
-  <!-- ================= APLICACIÓN ================= -->
+  <!-- APLICACIÓN -->
   <div id="app-screen" class="container">
     <div class="hero-banner">
       <img src="https://i.postimg.cc/Y2xk6G7V/Proyectado1.webp" alt="Proyectado" />
       <button class="logout-btn" onclick="cerrarSesion()">Cerrar sesión</button>
       <div class="hero-title">
-        <h1>🌧️ El Muro de las Proyectadas 🚬</h1>
-        
-        <!-- Botón de Discord -->
+        <h1>El Muro de las Proyectadas</h1>
         <a href="https://discord.gg/j9qh6fa3HU" target="_blank" class="discord-btn">
           <svg class="discord-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 127.14 96.36">
             <path d="M107.7,8.07A105.15,105.15,0,0,0,81.47,0a72.06,72.06,0,0,0-3.36,6.83A97.68,97.68,0,0,0,49,6.83,72.37,72.37,0,0,0,45.64,0,105.15,105.15,0,0,0,19.41,8.07C2.82,32.91-2.2,57.06.66,80.82a105.73,105.73,0,0,0,32.15,16.15,77.7,77.7,0,0,0,6.89-11.1,68.42,68.42,0,0,1-10.85-5.18c.91-.66,1.8-1.34,2.66-2a75.57,75.57,0,0,0,64.32,0c.87.71,1.76,1.39,2.66,2a68.68,68.68,0,0,1-10.87,5.19,77,77,0,0,0,6.89,11.1,105.25,105.25,0,0,0,32.19-16.15C129.84,57.51,121.75,32.48,107.7,8.07ZM42.49,65.16c-5.36,0-9.76-4.83-9.76-10.74s4.34-10.74,9.76-10.74c5.44,0,9.8,4.86,9.76,10.74C52.25,60.33,47.93,65.16,42.49,65.16Zm42.24,0c-5.36,0-9.76-4.83-9.76-10.74s4.34-10.74,9.76-10.74c5.44,0,9.8,4.86,9.76,10.74C94.49,60.33,90.17,65.16,84.73,65.16Z"/>
           </svg>
-          Únete a nuestro Discord
+          Unirse al Servidor
         </a>
       </div>
     </div>
 
     <!-- Pestañas -->
     <div class="nav-tabs">
-      <button class="tab-btn active" id="tab-feed" onclick="cambiarVista('feed')">📜 Muro</button>
-      <button class="tab-btn" id="tab-cine" onclick="cambiarVista('cine')">🎥 Salón Vip</button>
-      <button class="tab-btn" id="tab-perfil" onclick="cambiarVista('perfil')">👤 Mi Perfil</button>
+      <button class="tab-btn active" id="tab-feed" onclick="cambiarVista('feed')">Muro</button>
+      <button class="tab-btn" id="tab-cine" onclick="cambiarVista('cine')">Vip</button>
+      <button class="tab-btn" id="tab-perfil" onclick="cambiarVista('perfil')">Perfil</button>
     </div>
 
     <!-- Feed Principal -->
     <div id="main-content">
       <form id="proyectada-form">
         <div style="font-size: 13px; color: var(--accent); margin-bottom: 5px; display: flex; align-items: center;">
-          Posteando como: <b id="display-alias" style="margin-left: 5px;">@Cargando...</b>
+          Escribiendo como: <b id="display-alias" style="margin-left: 5px;">@...</b>
         </div>
         <select id="categoria">
-          <option value="LaExtraño">💔 #LaExtraño</option>
-          <option value="Sadboy">🌧️ #Sadboy</option>
-          <option value="Insomnio">🌙 #Insomnio</option>
-          <option value="MeIlusioné">🥀 #MeIlusioné</option>
-          <option value="Desahogo">🕯️ #Desahogo</option>
+          <option value="LaExtraño">#LaExtraño</option>
+          <option value="Sadboy">#Sadboy</option>
+          <option value="Insomnio">#Insomnio</option>
+          <option value="MeIlusioné">#MeIlusioné</option>
+          <option value="Desahogo">#Desahogo</option>
         </select>
-        <textarea id="contenido" rows="3" placeholder="Suelte ese desahogo melancólico..." required></textarea>
+        <textarea id="contenido" rows="3" placeholder="Suelte eso que no le deja dormir..." required></textarea>
         
         <div class="file-upload-box">
-          <label for="input-file" class="custom-file-btn">🖼️ Añadir foto</label>
+          <label for="input-file" class="custom-file-btn">Adjuntar memoria (foto)</label>
           <input type="file" id="input-file" accept="image/*" />
           <div class="preview-box" id="preview-box">
             <img id="preview-img" src="" />
@@ -225,48 +266,87 @@
 
         <div class="hype-container">
           <div class="hype-header">
-            <span>Nivel de Bajón:</span>
-            <span id="hype-value" style="color: #79a8d8;">50%</span>
+            <span>Nivel de vacío:</span>
+            <span id="hype-value" style="color: var(--accent);">50%</span>
           </div>
           <input type="range" id="hype-range" min="1" max="100" value="50" oninput="document.getElementById('hype-value').innerText = this.value + '%'" />
         </div>
-        <button type="submit" class="btn-submit" id="submit-btn">Soltar Proyección</button>
+        <button type="submit" class="btn-submit" id="submit-btn">Dejar ir</button>
       </form>
 
-      <!-- Filtros añadidos aquí -->
+      <!-- Filtros -->
       <div class="filtros-container">
-        <button class="filtro-btn active" onclick="filtrarCategoria('todas', this)">📜 Todas</button>
-        <button class="filtro-btn" onclick="filtrarCategoria('LaExtraño', this)">💔 #LaExtraño</button>
-        <button class="filtro-btn" onclick="filtrarCategoria('Sadboy', this)">🌧️ #Sadboy</button>
-        <button class="filtro-btn" onclick="filtrarCategoria('Insomnio', this)">🌙 #Insomnio</button>
-        <button class="filtro-btn" onclick="filtrarCategoria('MeIlusioné', this)">🥀 #MeIlusioné</button>
-        <button class="filtro-btn" onclick="filtrarCategoria('Desahogo', this)">🕯️ #Desahogo</button>
+        <button class="filtro-btn active" onclick="filtrarCategoria('todas', this)">Todo</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('LaExtraño', this)">#LaExtraño</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('Sadboy', this)">#Sadboy</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('Insomnio', this)">#Insomnio</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('MeIlusioné', this)">#MeIlusioné</button>
+        <button class="filtro-btn" onclick="filtrarCategoria('Desahogo', this)">#Desahogo</button>
       </div>
 
-      <div id="posts-container">Cargando...</div>
+      <div id="posts-container" style="color: #555; text-align: center; margin-top:20px;">Cargando...</div>
     </div>
 
-    <!-- Contenedor Mi Perfil -->
+    <!-- Perfil -->
     <div id="mi-perfil-container">
       <img src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" class="profile-avatar-large" />
       <div class="profile-username" id="mi-username">@Usuario</div>
-      <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px; text-align: left;">Mi Biografía:</p>
-      <textarea id="mi-biografia" rows="4" placeholder="Escribe algo sobre ti..."></textarea>
-      <button class="btn-submit" style="width: 100%; margin-top: 10px;" onclick="guardarBiografia()">Guardar Perfil</button>
+      <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px; text-align: left;">Mis pensamientos:</p>
+      <textarea id="mi-biografia" rows="4" placeholder="Algo que nadie leerá..."></textarea>
+      <button class="btn-submit" style="width: 100%; margin-top: 10px;" onclick="guardarBiografia()">Actualizar</button>
     </div>
   </div>
 
-  <!-- Modal para ver perfiles -->
+  <!-- Modal Perfiles -->
   <div class="modal-overlay" id="user-modal">
     <div class="modal-content">
       <button class="close-modal" onclick="cerrarModal()">✕</button>
       <img src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" class="profile-avatar-large" />
       <div class="profile-username" id="modal-username">@Usuario</div>
-      <div class="modal-bio" id="modal-bio">Cargando biografía...</div>
+      <div class="modal-bio" id="modal-bio">...</div>
     </div>
   </div>
 
-  <!-- SCRIPTS Y LÓGICA -->
+  <!-- ================= REPRODUCTOR DE MÚSICA ================= -->
+  <div id="yt-hidden-player"></div>
+  <div id="mini-player" class="mini-player-container" style="display: none;">
+    <div class="player-top">
+      
+      <!-- Botón para añadir a Supabase -->
+      <button class="player-menu-btn" onclick="abrirMenuAñadir()" title="Añadir a playlist global">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <div class="track-info">
+        <div class="track-title" id="player-title">Esperando...</div>
+        <div class="track-artist" id="player-artist">GomaPlayer</div>
+      </div>
+      
+      <div class="player-controls">
+        <button class="player-icon-btn hide-mobile"><i class="fas fa-random"></i></button>
+        <button class="player-icon-btn" onclick="playerPrev()"><i class="fas fa-step-backward"></i></button>
+        <button class="player-icon-btn play-btn" id="player-play-btn" onclick="playerToggle()"><i class="fas fa-play"></i></button>
+        <button class="player-icon-btn" onclick="playerNext()"><i class="fas fa-step-forward"></i></button>
+        <button class="player-icon-btn hide-mobile"><i class="fas fa-redo"></i></button>
+        <button class="player-icon-btn hide-mobile"><i class="far fa-star"></i></button>
+        <button class="player-icon-btn hide-mobile"><i class="fas fa-volume-down text-xs"></i></button>
+        <input type="range" class="vol-slider hide-mobile" id="player-vol" min="0" max="100" value="50">
+      </div>
+      
+      <div class="window-controls">
+        <button class="player-icon-btn hide-mobile"><i class="fas fa-minus text-xs"></i></button>
+        <button class="player-icon-btn" onclick="cerrarReproductor()"><i class="fas fa-times text-xs"></i></button>
+      </div>
+    </div>
+    
+    <div class="player-bottom">
+      <input type="range" class="track-slider" id="player-progress" min="0" max="100" value="0">
+      <div class="time-display"><span id="time-current">00:00</span> / <span id="time-total">00:00</span></div>
+    </div>
+  </div>
+
+
+  <!-- SCRIPTS -->
   <script>
     var modoRegistro = false;
     var usuarioActual = null;
@@ -275,42 +355,169 @@
     var postsData = [];
     var imagenBase64 = null;
     var db = null;
-    var categoriaFiltroActual = 'todas'; // Variable para el filtro
-    
-    // RANGO OWNER (Modificable)
+    var categoriaFiltroActual = 'todas';
     var OWNER_USERNAME = "Alex_Goma";
 
     function escapeHtml(str) { return (str||"").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
-
-    function generarEtiquetaOwner(username) {
-      if(username === OWNER_USERNAME) {
-        return `<span class="owner-badge">👑 Owner</span>`;
-      }
-      return "";
-    }
-
-    function mostrarErrorAuth(mensaje) {
-      var errDiv = document.getElementById('auth-error');
-      errDiv.innerHTML = "<b>❌ ATENCIÓN:</b><br/>" + mensaje;
-      errDiv.style.display = 'block';
-    }
-
+    function generarEtiquetaOwner(username) { return username === OWNER_USERNAME ? `<span class="owner-badge">Owner</span>` : ""; }
+    function mostrarErrorAuth(mensaje) { var errDiv = document.getElementById('auth-error'); errDiv.innerHTML = "X " + mensaje; errDiv.style.display = 'block'; }
     window.toggleAuthMode = function() {
       modoRegistro = !modoRegistro;
-      document.getElementById('auth-title').innerText = modoRegistro ? "Crear Perfil Nuevo 👤" : "Entrar al Muro 🗿";
+      document.getElementById('auth-title').innerText = modoRegistro ? "Crear Perfil" : "Entrar al Muro";
       document.getElementById('auth-main-btn').innerText = modoRegistro ? "Registrarme" : "Entrar";
-      document.getElementById('auth-toggle-btn').innerText = modoRegistro ? "¿Ya tienes perfil? Inicia sesión" : "¿No tienes perfil? Regístrate aquí";
+      document.getElementById('auth-toggle-btn').innerText = modoRegistro ? "Ya tengo perfil" : "Registrar un nuevo perfil";
       document.getElementById('auth-error').style.display = 'none';
     };
 
+    // SUPABASE SETUP
     if (typeof window.supabase === 'undefined') {
-      mostrarErrorAuth("Supabase no ha cargado. Revisa tu conexión a internet.");
+      mostrarErrorAuth("Sin conexión.");
     } else {
       const SUPABASE_URL = "https://flwunvjuvudfpwkszlgn.supabase.co";
       const SUPABASE_ANON_KEY = "sb_publishable_gmT2QjKFkJOyP5cmrySmQA_XbKQWlMS";
       db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     }
 
+    // ==========================================
+    // LÓGICA DEL REPRODUCTOR GOMAPLAYER (SUPABASE)
+    // ==========================================
+    let ytPlayer = null;
+    let isYtReady = false;
+    let playlistGlobal = [];
+    let currentSongIdx = 0;
+    let isPlaying = false;
+
+    function onYouTubeIframeAPIReady() {
+      ytPlayer = new YT.Player('yt-hidden-player', {
+        height: '0', width: '0',
+        playerVars: { 'autoplay': 0, 'controls': 0, 'disablekb': 1 },
+        events: {
+          'onReady': () => { isYtReady = true; cargarPlaylistDesdeSupabase(); },
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) { playerNext(); } 
+      else if (event.data === YT.PlayerState.PLAYING) {
+        isPlaying = true;
+        document.getElementById('player-play-btn').innerHTML = '<i class="fas fa-pause"></i>';
+      } 
+      else if (event.data === YT.PlayerState.PAUSED) {
+        isPlaying = false;
+        document.getElementById('player-play-btn').innerHTML = '<i class="fas fa-play"></i>';
+      }
+    }
+
+    async function cargarPlaylistDesdeSupabase() {
+      if(!db) return;
+      // Busca la tabla 'canciones'
+      const { data, error } = await db.from('canciones').select('*');
+      if (error || !data || data.length === 0) {
+        // Fallback triste por defecto
+        playlistGlobal = [{ titulo: "Fresh Fallen Snow", autor: "Chris Haugen", url: "k4yXQvwUGNQ" }];
+      } else {
+        playlistGlobal = data;
+      }
+      
+      document.getElementById('mini-player').style.display = 'flex';
+      cargarPista(0, false);
+    }
+
+    function extraerIDYoutube(url) {
+      const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/);
+      return match ? match[1] : url; // si no hace match, asumimos que ya es el ID
+    }
+
+    function cargarPista(index, autoPlay = true) {
+      if(playlistGlobal.length === 0) return;
+      currentSongIdx = index;
+      const cancion = playlistGlobal[index];
+      
+      document.getElementById('player-title').innerText = cancion.titulo;
+      document.getElementById('player-artist').innerText = cancion.autor || "Desconocido";
+      
+      if (isYtReady && ytPlayer) {
+        const videoId = extraerIDYoutube(cancion.url);
+        if(autoPlay) ytPlayer.loadVideoById(videoId);
+        else ytPlayer.cueVideoById(videoId);
+      }
+    }
+
+    function playerToggle() {
+      if (!isYtReady || !ytPlayer) return;
+      if (isPlaying) ytPlayer.pauseVideo();
+      else ytPlayer.playVideo();
+    }
+
+    function playerNext() {
+      if(playlistGlobal.length === 0) return;
+      let next = currentSongIdx + 1;
+      if(next >= playlistGlobal.length) next = 0;
+      cargarPista(next, true);
+    }
+
+    function playerPrev() {
+      if(playlistGlobal.length === 0) return;
+      let prev = currentSongIdx - 1;
+      if(prev < 0) prev = playlistGlobal.length - 1;
+      cargarPista(prev, true);
+    }
+
+    function cerrarReproductor() {
+      if(ytPlayer && isPlaying) ytPlayer.pauseVideo();
+      document.getElementById('mini-player').style.display = 'none';
+    }
+
+    function abrirMenuAñadir() {
+      const url = prompt("🎵 Pega el enlace de YouTube de la canción que te duele:");
+      if(!url) return;
+      const titulo = prompt("🏷️ Título de la pista:");
+      if(!titulo) return;
+      const autor = prompt("👤 Autor / Artista:");
+      
+      if(db) {
+        db.from('canciones').insert([{ titulo: titulo, autor: autor || "Desconocido", url: url }]).then(({error}) => {
+          if(error) alert("Ups, necesitas crear la tabla 'canciones' en tu Supabase primero.");
+          else {
+            alert("Memoria musical añadida al muro.");
+            cargarPlaylistDesdeSupabase();
+          }
+        });
+      }
+    }
+
+    // Sincronización de progreso y volumen
+    setInterval(() => {
+      if (isPlaying && isYtReady && ytPlayer && ytPlayer.getCurrentTime) {
+        const curr = ytPlayer.getCurrentTime();
+        const tot = ytPlayer.getDuration();
+        document.getElementById('player-progress').max = tot || 100;
+        document.getElementById('player-progress').value = curr || 0;
+        document.getElementById('time-current').innerText = formatTime(curr);
+        document.getElementById('time-total').innerText = formatTime(tot);
+      }
+    }, 1000);
+
+    function formatTime(s) {
+      if(isNaN(s) || !s) return "00:00";
+      const m = Math.floor(s/60);
+      const sec = Math.floor(s%60);
+      return `${m < 10 ? '0'+m : m}:${sec < 10 ? '0'+sec : sec}`;
+    }
+
+    document.getElementById('player-progress').addEventListener('input', (e) => {
+      if (isYtReady && ytPlayer) ytPlayer.seekTo(e.target.value, true);
+    });
+    
+    document.getElementById('player-vol').addEventListener('input', (e) => {
+      if (isYtReady && ytPlayer) ytPlayer.setVolume(e.target.value);
+    });
+
+    // ==========================================
+    // LOGICA PRINCIPAL (LOGIN, POSTS, ETC)
+    // ==========================================
     async function verificarSesion() {
       if (!db) return;
       const { data: { session } } = await db.auth.getSession();
@@ -324,8 +531,7 @@
         document.getElementById('display-alias').innerHTML = "@" + escapeHtml(usernameActual) + ownerTag;
         document.getElementById('mi-username').innerHTML = "@" + escapeHtml(usernameActual) + ownerTag;
         
-        cargarPosts();
-        cargarMiPerfil();
+        cargarPosts(); cargarMiPerfil();
       } else {
         document.getElementById('auth-screen').style.display = 'flex';
         document.getElementById('app-screen').style.display = 'none';
@@ -333,36 +539,30 @@
     }
 
     window.iniciarSesion = async function() {
-      if (!db) return mostrarErrorAuth("Supabase no cargó.");
-      
+      if (!db) return mostrarErrorAuth("Supabase desconectado.");
       const usernameInput = document.getElementById('auth-username').value.trim();
       const password = document.getElementById('auth-pass').value;
       const btn = document.getElementById('auth-main-btn');
       document.getElementById('auth-error').style.display = 'none';
 
-      if (!usernameInput || !password) return mostrarErrorAuth("Llena el usuario y la contraseña.");
-      if (password.length < 6) return mostrarErrorAuth("La contraseña debe tener mínimo 6 caracteres.");
+      if (!usernameInput || !password) return mostrarErrorAuth("Faltan datos.");
+      if (password.length < 6) return mostrarErrorAuth("Mínimo 6 caracteres.");
       
       const fakeEmail = usernameInput.toLowerCase() + "@muro.com";
-      btn.innerText = "Cargando..."; btn.disabled = true;
+      btn.innerText = "..."; btn.disabled = true;
 
       try {
         if (modoRegistro) {
-          const { data, error } = await db.auth.signUp({
-            email: fakeEmail, password: password, options: { data: { username: usernameInput } }
-          });
-          if (error) {
-            if(error.message.includes("already registered") || error.message.includes("User already registered")) throw new Error("Ese nombre de usuario ya está registrado.");
-            throw error;
-          }
+          const { data, error } = await db.auth.signUp({ email: fakeEmail, password: password, options: { data: { username: usernameInput } } });
+          if (error) throw new Error("Ese alias ya está en el muro o hubo un error.");
           if (data.user) {
             await db.from('perfiles').insert([{ id: data.user.id, username: usernameInput }]);
-            alert("¡Perfil creado con éxito!");
+            alert("Perfil creado en las sombras.");
             await verificarSesion();
           }
         } else {
           const { data, error } = await db.auth.signInWithPassword({ email: fakeEmail, password: password });
-          if (error) throw new Error("La cuenta no existe o la contraseña es incorrecta.");
+          if (error) throw new Error("Contraseña incorrecta o usuario fantasma.");
           await verificarSesion();
         }
       } catch (err) {
@@ -374,8 +574,7 @@
 
     window.cerrarSesion = async function() {
       if(db) await db.auth.signOut();
-      usuarioActual = null;
-      verificarSesion();
+      usuarioActual = null; verificarSesion();
     };
 
     window.cambiarVista = function(vista) {
@@ -394,58 +593,35 @@
       }
     };
 
-    // --- LÓGICA DE COMENTARIOS ---
     window.toggleComentarios = function(postId) {
       const sec = document.getElementById('comments-' + postId);
       if (sec.style.display === 'none' || sec.style.display === '') {
-        sec.style.display = 'block';
-        cargarComentarios(postId);
-      } else {
-        sec.style.display = 'none';
-      }
+        sec.style.display = 'block'; cargarComentarios(postId);
+      } else sec.style.display = 'none';
     };
 
     window.cargarComentarios = async function(postId) {
       const list = document.getElementById('comments-list-' + postId);
-      list.innerHTML = "<div style='color: var(--text-muted); font-size:12px;'>Cargando...</div>";
-      
+      list.innerHTML = "<div style='color: #666; font-size:12px;'>Cargando...</div>";
       const { data, error } = await db.from('comentarios').select('*').eq('post_id', postId).order('created_at', { ascending: true });
-      if(error) { list.innerHTML = "Error al cargar comentarios."; return; }
+      if(error) { list.innerHTML = "Error."; return; }
+      if(data.length === 0) { list.innerHTML = "<div style='color: #555; font-size:12px; margin-bottom:5px;'>Silencio absoluto.</div>"; return; }
       
-      if(data.length === 0) {
-        list.innerHTML = "<div style='color: var(--text-muted); font-size:12px; margin-bottom:5px;'>Nadie ha comentado. Sé el primero.</div>";
-        return;
-      }
-      
-      list.innerHTML = data.map(c => {
-        let tag = generarEtiquetaOwner(c.autor);
-        return `
-          <div class="comment-item">
-            <span class="comment-author" onclick="abrirPerfil('${escapeHtml(c.autor)}')">@${escapeHtml(c.autor)}${tag}</span>
-            <span style="color: #d0d7de;">${escapeHtml(c.contenido)}</span>
-          </div>`;
-      }).join("");
+      list.innerHTML = data.map(c => `<div class="comment-item"><span class="comment-author" onclick="abrirPerfil('${escapeHtml(c.autor)}')">@${escapeHtml(c.autor)}${generarEtiquetaOwner(c.autor)}</span><span>${escapeHtml(c.contenido)}</span></div>`).join("");
     };
 
     window.enviarComentario = async function(postId) {
       const input = document.getElementById('comment-input-' + postId);
       const btn = document.getElementById('btn-comment-' + postId);
       const contenido = input.value.trim();
-      
       if(!contenido) return;
-      
       input.disabled = true; btn.disabled = true;
       const { error } = await db.from('comentarios').insert([{ post_id: postId, autor: usernameActual, contenido }]);
       input.disabled = false; btn.disabled = false;
-      
-      if(error) alert("Error al comentar: " + error.message);
-      else {
-        input.value = "";
-        cargarComentarios(postId);
-      }
+      if(error) alert("Error: " + error.message);
+      else { input.value = ""; cargarComentarios(postId); }
     };
 
-    // --- PERFIL Y FEED ---
     async function cargarMiPerfil() {
       if(!db) return;
       const { data, error } = await db.from('perfiles').select('biografia').eq('id', usuarioActual.id).single();
@@ -455,31 +631,26 @@
     window.guardarBiografia = async function() {
       const bio = document.getElementById('mi-biografia').value.trim();
       const { error } = await db.from('perfiles').update({ biografia: bio }).eq('id', usuarioActual.id);
-      if(error) alert("Error al guardar: " + error.message);
-      else alert("¡Biografía actualizada!");
+      if(error) alert("Error: " + error.message);
+      else alert("Actualizado.");
     };
 
     window.abrirPerfil = async function(usernameClick) {
-      const ownerTag = generarEtiquetaOwner(usernameClick);
-      document.getElementById('modal-username').innerHTML = "@" + escapeHtml(usernameClick) + ownerTag;
-      document.getElementById('modal-bio').innerText = "Cargando biografía...";
+      document.getElementById('modal-username').innerHTML = "@" + escapeHtml(usernameClick) + generarEtiquetaOwner(usernameClick);
+      document.getElementById('modal-bio').innerText = "...";
       document.getElementById('user-modal').style.display = 'flex';
-
       const { data, error } = await db.from('perfiles').select('biografia').eq('username', usernameClick).single();
-      if(data) document.getElementById('modal-bio').innerText = data.biografia || "Este usuario aún no tiene biografía.";
-      else document.getElementById('modal-bio').innerText = "Perfil no encontrado.";
+      if(data) document.getElementById('modal-bio').innerText = data.biografia || "Vacío.";
+      else document.getElementById('modal-bio').innerText = "No encontrado.";
     };
-
     window.cerrarModal = function() { document.getElementById('user-modal').style.display = 'none'; };
     document.getElementById('user-modal').addEventListener('click', function(e) { if(e.target === this) cerrarModal(); });
 
     document.getElementById("input-file").addEventListener("change", function(e) {
-      const file = e.target.files[0];
-      if (!file) return;
+      const file = e.target.files[0]; if (!file) return;
       const reader = new FileReader();
       reader.onload = function(event) {
-        const img = new Image();
-        img.src = event.target.result;
+        const img = new Image(); img.src = event.target.result;
         img.onload = function() {
           const canvas = document.createElement("canvas");
           const MAX_WIDTH = 800; let width = img.width, height = img.height;
@@ -494,22 +665,12 @@
       reader.readAsDataURL(file);
     });
 
-    window.quitarImagen = function() {
-      imagenBase64 = null; document.getElementById("input-file").value = "";
-      document.getElementById("preview-box").style.display = "none";
-    };
+    window.quitarImagen = function() { imagenBase64 = null; document.getElementById("input-file").value = ""; document.getElementById("preview-box").style.display = "none"; };
 
-    // Función para cambiar de categoría
     window.filtrarCategoria = function(categoria, btnElement) {
       categoriaFiltroActual = categoria;
-      
-      // Quitar clase activa de todos los botones
       document.querySelectorAll('.filtro-btn').forEach(btn => btn.classList.remove('active'));
-      
-      // Poner clase activa al botón clickeado
       if (btnElement) btnElement.classList.add('active');
-      
-      // Recargar los posts con el nuevo filtro
       renderPosts();
     };
 
@@ -524,56 +685,41 @@
       const container = document.getElementById("posts-container");
       let lista = [...postsData];
       
-      if (vistaActual === 'cine') {
-        lista.sort((a, b) => ((b.chad_count||0)+(b.fuego_count||0)+(b.skull_count||0)) - ((a.chad_count||0)+(a.fuego_count||0)+(a.skull_count||0)));
-      }
-      
-      // APLICAR EL FILTRO DE ETIQUETAS
-      if (categoriaFiltroActual !== 'todas') {
-        lista = lista.filter(post => post.categoria === categoriaFiltroActual);
-      }
-
-      if (lista.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 20px; color: var(--text-muted);">No hay desahogos en esta categoría todavía.</div>`;
+      if (vistaActual === 'cine') lista.sort((a, b) => ((b.chad_count||0)+(b.fuego_count||0)+(b.skull_count||0)) - ((a.chad_count||0)+(a.fuego_count||0)+(a.skull_count||0)));
+      if (categoriaFiltroActual !== 'todas') lista = lista.filter(post => post.categoria === categoriaFiltroActual);
+      if (lista.length === 0) return container.innerHTML = `<div style="text-align:center; padding: 20px; color: #555;">No hay nada que mostrar aquí.</div>`;
 
       container.innerHTML = lista.map((post) => {
         let imgHtml = post.imagen_url ? `<div class="post-image-box"><img src="${post.imagen_url}"/></div>` : "";
-        let ownerTag = generarEtiquetaOwner(post.autor);
-        
         return `
           <div class="post-card" id="card-${post.id}">
             <div class="post-header">
               <img class="avatar" src="https://i.postimg.cc/y6TBmgK2/Proyectado2.webp" onclick="abrirPerfil('${escapeHtml(post.autor)}')" />
               <div>
-                <div class="author-name" onclick="abrirPerfil('${escapeHtml(post.autor)}')">@${escapeHtml(post.autor)} ${ownerTag}</div>
-                <div style="font-size: 11px; color: var(--text-muted);">
-                  ${new Date(post.created_at).toLocaleDateString()} • #${escapeHtml(post.categoria)}
-                </div>
+                <div class="author-name" onclick="abrirPerfil('${escapeHtml(post.autor)}')">@${escapeHtml(post.autor)} ${generarEtiquetaOwner(post.autor)}</div>
+                <div style="font-size: 11px; color: var(--text-muted);">${new Date(post.created_at).toLocaleDateString()} • #${escapeHtml(post.categoria)}</div>
               </div>
             </div>
             <div class="card-hype-bar"><div class="card-hype-fill" style="width: ${post.hype_level || 50}%"></div></div>
             <div class="post-body">${escapeHtml(post.contenido)}</div>
             ${imgHtml}
-            
             <div class="post-footer">
               <div class="reactions">
                 <button class="react-btn" onclick="votar(${post.id}, 'chad')">💔 <span>${post.chad_count || 0}</span></button>
                 <button class="react-btn" onclick="votar(${post.id}, 'fuego')">🚬 <span>${post.fuego_count || 0}</span></button>
                 <button class="react-btn" onclick="votar(${post.id}, 'skull')">💀 <span>${post.skull_count || 0}</span></button>
-                <button class="react-btn" onclick="toggleComentarios(${post.id})">💬 Comentar</button>
+                <button class="react-btn" onclick="toggleComentarios(${post.id})">💬</button>
               </div>
-              <button class="btn-capture" onclick="descargarTarjeta(${post.id})">📸 Captura</button>
+              <button class="btn-capture" onclick="descargarTarjeta(${post.id})">📸</button>
             </div>
-
-            <!-- Sección de Comentarios Oculta -->
             <div class="comments-section" id="comments-${post.id}">
               <div id="comments-list-${post.id}"></div>
               <div class="comment-input-box">
-                <input type="text" id="comment-input-${post.id}" placeholder="Responde a esto..." />
+                <input type="text" id="comment-input-${post.id}" placeholder="..." />
                 <button id="btn-comment-${post.id}" onclick="enviarComentario(${post.id})">Enviar</button>
               </div>
             </div>
-          </div>
-        `;
+          </div>`;
       }).join("");
     }
 
@@ -586,79 +732,46 @@
 
     window.descargarTarjeta = function(id) {
       const card = document.getElementById(`card-${id}`);
-      html2canvas(card, { backgroundColor: "#12161f", scale: 2, useCORS: true }).then(canvas => {
-        const link = document.createElement("a"); link.download = `proyectada-${id}.png`;
-        link.href = canvas.toDataURL("image/png"); link.click();
+      html2canvas(card, { backgroundColor: "#0a0a0c", scale: 2, useCORS: true }).then(canvas => {
+        const link = document.createElement("a"); link.download = `proyectada-${id}.png`; link.href = canvas.toDataURL("image/png"); link.click();
       });
     };
 
     document.getElementById("proyectada-form").addEventListener("submit", async (e) => {
       e.preventDefault();
       if(!db) return;
-      const btn = document.getElementById("submit-btn");
-      btn.disabled = true; btn.innerText = "Publicando...";
-
+      const btn = document.getElementById("submit-btn"); btn.disabled = true; btn.innerText = "...";
       const contenido = document.getElementById("contenido").value.trim();
       const categoria = document.getElementById("categoria").value;
       const hype_level = document.getElementById("hype-range").value;
-
-      await db.from("proyectadas").insert([{
-        autor: usernameActual, contenido, categoria, hype_level, imagen_url: imagenBase64
-      }]);
       
-      // ==========================================
-      // WEBHOOK DE DISCORD AUTOMÁTICA CON IMAGEN
-      // ==========================================
+      await db.from("proyectadas").insert([{ autor: usernameActual, contenido, categoria, hype_level, imagen_url: imagenBase64 }]);
+      
       const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1564820172294848632/pgSEqPtKxMuiR0nXN6I-jpqOtQZXORj6woqi1yuYJskLI9UuIWkoIbl0qTlmypjiGK2H";
-      
       if (DISCORD_WEBHOOK_URL) {
-        const mensajeTexto = `🌧️ **Nueva Proyectada en el Muro** 🚬\n**Autor:** @${usernameActual}\n**Categoría:** #${categoria}\n**Nivel de Bajón:** ${hype_level}%\n\n> ${contenido}`;
-        
+        const mensajeTexto = `🌧️ **Nueva Proyectada en el Muro** 🚬\n**Autor:** @${usernameActual}\n**Categoría:** #${categoria}\n**Nivel de Vacío:** ${hype_level}%\n\n> ${contenido}`;
         if (imagenBase64) {
-          // Convertimos la imagen de Base64 a un archivo real para que Discord la reciba adjunta
-          fetch(imagenBase64)
-            .then(res => res.blob())
-            .then(blob => {
-              const formData = new FormData();
-              // Añadimos el texto
-              formData.append("payload_json", JSON.stringify({ content: mensajeTexto }));
-              // Adjuntamos la imagen
-              formData.append("file", blob, "proyectada.jpg");
-              
-              return fetch(DISCORD_WEBHOOK_URL, {
-                method: "POST",
-                body: formData
-              });
-            })
-            .catch(err => console.error("Error al enviar webhook con imagen:", err));
+          fetch(imagenBase64).then(res => res.blob()).then(blob => {
+            const formData = new FormData();
+            formData.append("payload_json", JSON.stringify({ content: mensajeTexto }));
+            formData.append("file", blob, "proyectada.jpg");
+            fetch(DISCORD_WEBHOOK_URL, { method: "POST", body: formData });
+          });
         } else {
-          // Si no hay imagen subida, se envía solo texto normal
-          fetch(DISCORD_WEBHOOK_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ content: mensajeTexto })
-          }).catch(err => console.error("Error al enviar webhook de texto:", err));
+          fetch(DISCORD_WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ content: mensajeTexto }) });
         }
       }
-      // ==========================================
-
-      document.getElementById("contenido").value = "";
-      quitarImagen();
-      cargarPosts();
-      btn.disabled = false; btn.innerText = "Soltar Proyección";
+      
+      document.getElementById("contenido").value = ""; quitarImagen(); cargarPosts(); btn.disabled = false; btn.innerText = "Dejar ir";
     });
 
     if(db) {
       try { 
         db.channel("muro-realtime").on("postgres_changes", { event: "*", schema: "public", table: "proyectadas" }, cargarPosts).subscribe(); 
-        
-        // Tiempo real para los comentarios
         db.channel("comentarios-realtime").on("postgres_changes", { event: "INSERT", schema: "public", table: "comentarios" }, (payload) => {
           const postId = payload.new.post_id;
           const sec = document.getElementById('comments-' + postId);
-          if(sec && sec.style.display === 'block') {
-            cargarComentarios(postId);
-          }
+          if(sec && sec.style.display === 'block') cargarComentarios(postId);
         }).subscribe();
       } catch(e){}
       verificarSesion();
