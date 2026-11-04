@@ -1036,7 +1036,7 @@
       
       await db.from("proyectadas").insert([{ autor: usernameActual, contenido, categoria, hype_level, imagen_url: imagenBase64 }]);
       
-      const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1564820172294848632/pgSEqPtKxMuiR0nXN6I-jpqOtQZXORj6woqi1yuYJskLI9UuIWkoIbl0qTlmypjiGK2H";
+      const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1567370737688252439/Zw1rxWB9B94Zq31esRgtlbRJRks544vzNk6G91ikhE0J2NV-Y1WBapu7qnipz1I1-69O";
       if (DISCORD_WEBHOOK_URL) {
         const mensajeTexto = `🌧️ **Nueva Proyectada en el Muro** 🚬\n**Autor:** @${usernameActual}\n**Categoría:** #${categoria}\n**Nivel de Vacío:** ${hype_level}%\n\n> ${contenido}`;
         if (imagenBase64) {
